@@ -25,6 +25,7 @@ final class GlossaryCheckCommand extends Command
     protected $signature = 'help:glossary-check
         {--main-project= : A checkout of gpl-ajackson/firstmilemanager (required)}
         {--main-project-ref=main : The ref that checkout is at, for the report}
+        {--stockist= : A checkout of gpl-ajackson/stockist at main, whose GLOSSARY.md is read for the terms both apps share (the Glossary and Words checks)}
         {--content= : The content folder (default: config help.content_path)}
         {--post-to= : Post the findings to the Content Owner on this repository\'s issues (owner/name), with GITHUB_TOKEN}';
 
@@ -55,6 +56,7 @@ final class GlossaryCheckCommand extends Command
             contentPath: rtrim($content, '/'),
             mainProject: new MainProject(rtrim($mainProject, '/')),
             templatesPath: base_path('docs/writing/templates'),
+            stockistPath: ($stockist = $this->stringOption('stockist')) === null ? null : rtrim($stockist, '/'),
         ), $findings);
 
         $this->line("Glossary Check over {$content}, against the main project at {$mainProject} ({$ref}):");
@@ -63,6 +65,9 @@ final class GlossaryCheckCommand extends Command
         }
         foreach ($findings->reports() as $finding) {
             $this->line("REPORT {$finding}");
+        }
+        foreach ($findings->checksNotRun() as $notRun) {
+            $this->line("Not run: {$notRun}.");
         }
         $failures = count($findings->failures());
         $reports = count($findings->reports());

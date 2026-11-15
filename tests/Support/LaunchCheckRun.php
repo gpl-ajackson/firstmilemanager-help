@@ -30,6 +30,8 @@ final class LaunchCheckRun
 
     private bool $hasMarketingSite = true;
 
+    private ?FixtureMainProject $stockist = null;
+
     public int $exitCode = 0;
 
     public string $output = '';
@@ -49,6 +51,14 @@ final class LaunchCheckRun
     public function marketingSite(FixtureMarketingSite $marketingSite): self
     {
         $this->marketingSite = $marketingSite;
+
+        return $this;
+    }
+
+    /** A checkout of Stockist, whose GLOSSARY.md the Glossary and Words checks read for shared terms (--stockist). */
+    public function stockist(FixtureMainProject $stockist): self
+    {
+        $this->stockist = $stockist;
 
         return $this;
     }
@@ -117,6 +127,7 @@ final class LaunchCheckRun
             '--style-guide' => $this->styleGuidePath ?? sys_get_temp_dir().'/no-style-guide-'.getmypid(),
             '--markdown' => $markdownFile,
             ...($this->hasMarketingSite ? ['--marketing-site' => ($this->marketingSite ??= FixtureMarketingSite::make())->path()] : []),
+            ...($this->stockist !== null ? ['--stockist' => $this->stockist->path()] : []),
             ...$options,
         ];
         if ($this->description !== null) {

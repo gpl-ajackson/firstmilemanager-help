@@ -89,6 +89,8 @@ final class DriftReportRun
                 '--content' => $this->content->path(),
                 '--pictures' => $this->content->picturesPath(),
                 '--main-project' => $this->mainProject->path(),
+                // Stockist's checkout, as CI gives it, sharing none of the fixture's terms.
+                '--stockist' => FixtureMainProject::make()->glossary(['Putaway' => 'Moving received stock to a Location.'])->path(),
                 '--support-site-ref' => 'main',
                 '--run-url' => self::RUN_URL,
                 '--post-to' => FakeGitHubIssues::REPOSITORY,

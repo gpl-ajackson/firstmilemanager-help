@@ -6,6 +6,7 @@ use App\Content\ContentInspection;
 use App\Content\ContentLibrary;
 use App\Content\ContentProblem;
 use App\Content\GlossaryEntrySource;
+use App\LaunchChecks\Glossary\MainGlossary;
 use App\LaunchChecks\Pages\PageChecks;
 use App\LaunchChecks\Pages\PagesRun;
 use App\LaunchChecks\SourceReferences\MainProjectIssues;
@@ -63,7 +64,25 @@ final class CheckContext
          * through Cloudflare Access with its service token while the help centre is behind it.
          */
         public readonly ?string $speedAt = null,
+        /**
+         * A checkout of Stockist (gpl-ajackson/stockist) at main, whose GLOSSARY.md the Glossary
+         * and Words checks read for the terms both apps share (help:launch-checks --stockist).
+         */
+        public readonly ?string $stockistPath = null,
     ) {}
+
+    /** Stockist's GLOSSARY.md once read: false until then, null when there is no checkout or no file. */
+    private MainGlossary|false|null $stockistGlossary = false;
+
+    /** Stockist's GLOSSARY.md, for the terms both apps share; null when no checkout was given or it has none. */
+    public function stockistGlossary(): ?MainGlossary
+    {
+        if ($this->stockistGlossary === false) {
+            $this->stockistGlossary = $this->stockistPath === null ? null : MainGlossary::read($this->stockistPath.'/'.MainGlossary::FILE);
+        }
+
+        return $this->stockistGlossary;
+    }
 
     /**
      * Every Markdown file in the content folder's articles folder, drafts and retired included.

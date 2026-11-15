@@ -12,7 +12,11 @@ use App\LaunchChecks\WordPattern;
 
 /**
  * Launch Check 4, Glossary (spec #30): the published Glossary keeps up with the main project's
- * GLOSSARY.md without blocking work. Only a published entry naming a term GLOSSARY.md no
+ * GLOSSARY.md without blocking work. It reads Stockist's GLOSSARY.md too (--stockist, fmm#56):
+ * a term both apps define is a shared term, and help must mean by it what Stockist means, since
+ * a Joint Operator's people meet it in both. Each shared term's Term Status records Stockist's
+ * definition as last checked (stockist_fingerprint); one with none fails, and a definition
+ * Stockist has changed since is reported. The Words check fails Stockist's avoid words for them. Only a published entry naming a term GLOSSARY.md no
  * longer has (or writes differently) fails. Reported, never failing: terms with no Term Status
  * (failing at launch), Not built yet terms Stockist's screens now show, Ahead terms, changed
  * definitions, and Term Statuses that don't match the entries. It runs with every Launch Check
@@ -32,8 +36,62 @@ final readonly class GlossaryCheck implements Check
         $areas = ProductAreaList::read($context->contentPath, new Findings);
         $statuses = TermStatusList::read($context->contentPath, $glossary, $areas, $findings);
 
-        $entriesByTerm = $this->checkEntries($context->glossaryEntries(), $glossary, $statuses, $findings);
+        $stockist = $context->stockistGlossary();
+        if ($context->stockistPath === null) {
+            $findings->notRun('Glossary, the terms First Mile Manager shares with Stockist: give --stockist=<a checkout of gpl-ajackson/stockist>');
+        } elseif ($stockist === null) {
+            $findings->fail('glossary.stockist-source', MainGlossary::FILE, null, "Stockist's checkout at {$context->stockistPath} has no GLOSSARY.md, so the shared terms can't be checked: is --stockist a checkout of gpl-ajackson/stockist?");
+        }
+
+        $entriesByTerm = $this->checkEntries($context->glossaryEntries(), $glossary, $statuses, $findings, $stockist);
         $this->checkStatuses($context, $glossary, $statuses, $entriesByTerm, $findings);
+        if ($stockist !== null) {
+            $this->checkSharedTerms($glossary, $stockist, $statuses, $findings);
+        }
+    }
+
+    /**
+     * The terms First Mile Manager's GLOSSARY.md and Stockist's both define, by First Mile
+     * Manager's name, each with Stockist's definition.
+     *
+     * @return array<string, GlossaryTerm>
+     */
+    public static function sharedTerms(MainGlossary $glossary, MainGlossary $stockist): array
+    {
+        $shared = [];
+        foreach (array_keys($glossary->terms) as $name) {
+            $spelled = $stockist->spelledAs($name);
+            if ($spelled !== null) {
+                $shared[$name] = $stockist->terms[$spelled];
+            }
+        }
+
+        return $shared;
+    }
+
+    /**
+     * Fails a shared term whose Term Status doesn't record that its help was checked against
+     * Stockist's definition, reports one whose Stockist definition has changed since, and
+     * reports a stockist_fingerprint on a term Stockist doesn't define.
+     */
+    private function checkSharedTerms(MainGlossary $glossary, MainGlossary $stockist, TermStatusList $statuses, Findings $findings): void
+    {
+        $shared = self::sharedTerms($glossary, $stockist);
+        foreach ($statuses->entries as $name => $status) {
+            $theirs = $shared[$name] ?? null;
+            if ($theirs === null) {
+                if ($status->stockistFingerprint !== null) {
+                    $findings->report('glossary.shared-term', TermStatusList::FILE, $status->line, "\"{$name}\" is not a term in Stockist's GLOSSARY.md any more: take its stockist_fingerprint off");
+                }
+
+                continue;
+            }
+            if ($status->stockistFingerprint === null) {
+                $findings->fail('glossary.shared-term', TermStatusList::FILE, $status->line, "\"{$name}\" is a term in Stockist's GLOSSARY.md too: check that its Glossary Entry and the Articles that use it mean what Stockist means by it (\"{$theirs->definition}\"), then set stockist_fingerprint: '{$theirs->fingerprint()}'");
+            } elseif ($status->stockistFingerprint !== $theirs->fingerprint()) {
+                $findings->report('glossary.shared-meaning', TermStatusList::FILE, $status->line, "Stockist's GLOSSARY.md has changed its definition of \"{$name}\" since it was last checked: check that its Glossary Entry and the Articles that use it still mean what Stockist means by it, then set stockist_fingerprint: '{$theirs->fingerprint()}'");
+            }
+        }
     }
 
     /**
@@ -43,7 +101,7 @@ final readonly class GlossaryCheck implements Check
      * @param  list<ArticleFile>  $entries
      * @return array<string, true> the terms that have an entry
      */
-    private function checkEntries(array $entries, MainGlossary $glossary, TermStatusList $statuses, Findings $findings): array
+    private function checkEntries(array $entries, MainGlossary $glossary, TermStatusList $statuses, Findings $findings, ?MainGlossary $stockist): array
     {
         $byTerm = [];
         foreach ($entries as $entry) {
@@ -52,6 +110,11 @@ final readonly class GlossaryCheck implements Check
                 continue; // check 1 names a missing term, as the rebuild refuses it
             }
             $line = $entry->lineOf('term');
+            if (! $glossary->has($term) && $stockist?->has($term) === true) {
+                $findings->fail('glossary.term', $entry->file, $line, "\"{$term}\" is a term in Stockist's GLOSSARY.md, not First Mile Manager's: this help centre's Glossary explains First Mile Manager's terms, so explain it in a Joint-only Article instead");
+
+                continue;
+            }
             if (! $glossary->has($term)) {
                 $spelled = $glossary->spelledAs($term);
                 $findings->fail('glossary.term', $entry->file, $line, $spelled === null

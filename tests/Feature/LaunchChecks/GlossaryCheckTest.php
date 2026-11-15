@@ -155,7 +155,7 @@ it('fails a Term Status list it can\'t use, naming the line', function (array $c
     'a Published term\'s area not on the Product Area list' => [['Location' => ['product_area' => 'Floor']], 'term-status.yaml:1 [glossary.term-status-format] "Location": product_area "Floor" is not on the Product Area list (product-areas.yaml)'],
     'Ahead on a term that is not Published' => [['Pick List' => ['ahead' => true]], 'term-status.yaml:9 [glossary.term-status-format] "Pick List": only a Published term can be marked Ahead'],
     'no fingerprint' => [['On Hold' => ['fingerprint' => null]], 'term-status.yaml:13 [glossary.term-status-format] "On Hold": fingerprint is missing: set fingerprint: '.ON_HOLD_FINGERPRINT],
-    'an unknown field' => [['On Hold' => ['staff_only' => true]], 'term-status.yaml:13 [glossary.term-status-format] "On Hold": staff_only is not a Term Status field (known fields: status, product_area, ahead, fingerprint)'],
+    'an unknown field' => [['On Hold' => ['staff_only' => true]], 'term-status.yaml:13 [glossary.term-status-format] "On Hold": staff_only is not a Term Status field (known fields: status, product_area, ahead, fingerprint, stockist_fingerprint)'],
 ]);
 
 it('fails a Term Status list that isn\'t valid YAML', function () {
@@ -184,4 +184,85 @@ it('fails when the main project has no GLOSSARY.md', function () {
     expect($run->failures())->toBe([
         'GLOSSARY.md [glossary.source] the main project has no GLOSSARY.md, so no term can be checked: is --main-project a checkout of gpl-ajackson/firstmilemanager?',
     ]);
+});
+
+/*
+ * Shared terms (fmm#56): a term both First Mile Manager's GLOSSARY.md and Stockist's define must
+ * mean in help what Stockist means by it, since a Joint Operator's people meet it in both apps.
+ */
+
+/** Stockist's checkout, defining On Hold (shared) and a term of its own. */
+function stockistGlossary(string $onHold = 'A pause on a client account.'): FixtureMainProject
+{
+    return mainProject()->glossary([
+        'On Hold' => [$onHold, ['suspended']],
+        'Putaway' => 'Moving received stock to a Location.',
+    ]);
+}
+
+it('passes a shared term whose Term Status records Stockist\'s definition as checked', function () {
+    $run = launchChecks(glossaryContent(['On Hold' => ['stockist_fingerprint' => ON_HOLD_FINGERPRINT]]))
+        ->against(glossaryProject())->stockist(stockistGlossary())->run();
+
+    expect($run->failures())->toBe([])
+        ->and($run->reports())->toBe([])
+        ->and($run->output)->not->toContain('Not run: Glossary');
+});
+
+it('fails a shared term whose Term Status has no stockist_fingerprint', function () {
+    $run = launchChecks(glossaryContent())->against(glossaryProject())->stockist(stockistGlossary())->run();
+
+    expect($run->exitCode)->toBe(Command::FAILURE)
+        ->and($run->failures())->toBe([
+            'term-status.yaml:13 [glossary.shared-term] "On Hold" is a term in Stockist\'s GLOSSARY.md too: check that its Glossary Entry and the Articles that use it mean what Stockist means by it ("A pause on a client account."), then set stockist_fingerprint: \''.ON_HOLD_FINGERPRINT.'\'',
+        ]);
+});
+
+it('reports a shared term whose Stockist definition has changed since it was checked', function () {
+    $run = launchChecks(glossaryContent(['On Hold' => ['stockist_fingerprint' => ON_HOLD_FINGERPRINT]]))
+        ->against(glossaryProject())->stockist(stockistGlossary('A pause on a whole client account.'))->run();
+
+    expect($run->failures())->toBe([])
+        ->and($run->reports())->toBe([
+            'term-status.yaml:13 [glossary.shared-meaning] Stockist\'s GLOSSARY.md has changed its definition of "On Hold" since it was last checked: check that its Glossary Entry and the Articles that use it still mean what Stockist means by it, then set stockist_fingerprint: \'d0bdd9c2c532\'',
+        ]);
+});
+
+it('reports a stockist_fingerprint on a term Stockist doesn\'t define', function () {
+    $run = launchChecks(glossaryContent([
+        'On Hold' => ['stockist_fingerprint' => ON_HOLD_FINGERPRINT],
+        'Location' => ['stockist_fingerprint' => LOCATION_FINGERPRINT],
+    ]))->against(glossaryProject())->stockist(stockistGlossary())->run();
+
+    expect($run->failures())->toBe([])
+        ->and($run->reports())->toBe([
+            'term-status.yaml:1 [glossary.shared-term] "Location" is not a term in Stockist\'s GLOSSARY.md any more: take its stockist_fingerprint off',
+        ]);
+});
+
+it('fails an entry naming a term only Stockist defines', function () {
+    $run = launchChecks(glossaryContent(['On Hold' => ['stockist_fingerprint' => ON_HOLD_FINGERPRINT]])->glossaryEntry('putaway', ['term' => 'Putaway']))
+        ->against(glossaryProject())->stockist(stockistGlossary())->run();
+
+    expect($run->failures())->toBe([
+        'glossary/putaway.md:2 [glossary.term] "Putaway" is a term in Stockist\'s GLOSSARY.md, not First Mile Manager\'s: this help centre\'s Glossary explains First Mile Manager\'s terms, so explain it in a Joint-only Article instead',
+    ]);
+});
+
+it('doesn\'t check shared terms without a checkout of Stockist, and says so', function () {
+    $run = launchChecks(glossaryContent())->against(glossaryProject())->run();
+
+    expect($run->failures())->toBe([])
+        ->and($run->output)->toContain('Not run: Glossary, the terms First Mile Manager shares with Stockist: give --stockist=<a checkout of gpl-ajackson/stockist>');
+});
+
+it('fails a Stockist checkout with no GLOSSARY.md', function () {
+    $stockist = stockistGlossary();
+    unlink($stockist->path().'/GLOSSARY.md');
+
+    $run = launchChecks(glossaryContent())->against(glossaryProject())->stockist($stockist)->run();
+
+    expect($run->failures())->toContain(
+        'GLOSSARY.md [glossary.stockist-source] Stockist\'s checkout at '.$stockist->path().' has no GLOSSARY.md, so the shared terms can\'t be checked: is --stockist a checkout of gpl-ajackson/stockist?',
+    );
 });

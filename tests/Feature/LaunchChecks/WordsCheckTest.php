@@ -232,3 +232,34 @@ it('fails Ignored Words it can\'t read', function () {
         'ignored-words.yaml:1 [words.ignored-format] must be a list of words, one "- " line each',
     ]);
 });
+
+it('fails a word Stockist\'s GLOSSARY.md says to avoid for a term both apps share (fmm#56)', function () {
+    $stockist = mainProject()->glossary(['Location' => ['A place stock is kept.', ['pigeonhole']]]);
+    $content = anArticle('Put the stock in the pigeonhole.');
+    $run = launchChecks($content)->against(wordsProject())->stockist($stockist)->styleGuide([])->run();
+
+    expect(wordFailures($run))->toBe([
+        'articles/put-stock-away.md:'.$content->lineOf('articles/put-stock-away.md', 'Put the stock').' [words.avoid] "pigeonhole" is a word GLOSSARY.md says to avoid: say "Location" (to name it as the wrong word, put it in quotation marks)',
+    ]);
+});
+
+it('doesn\'t fail Stockist\'s avoid words for a term First Mile Manager doesn\'t share', function () {
+    $stockist = mainProject()->glossary(['Putaway' => ['Moving received stock to a Location.', ['pigeonhole']]]);
+    $run = launchChecks(anArticle('Put the stock in the pigeonhole.'))->against(wordsProject())->stockist($stockist)->styleGuide([])->run();
+
+    expect(wordFailures($run))->toBe([]);
+});
+
+it('doesn\'t fail a Stockist avoid word that First Mile Manager\'s own names are made of', function () {
+    // Stockist avoids "manager" for its Admin; First Mile Manager's roles and name use it.
+    $project = mainProject()->glossary([
+        'Admin' => ['The owner\'s Staff Role.', ['superuser']],
+        'Transport Manager' => 'A Staff Role that keeps vehicles.',
+    ]);
+    $stockist = mainProject()->glossary(['Admin' => ['The owner\'s Staff Role.', ['Superuser', 'manager']]]);
+    $run = launchChecks(anArticle('Ask your Admin or Transport Manager in First Mile Manager, not the superuser.'))
+        ->against($project)->stockist($stockist)->styleGuide([])->run();
+
+    expect(wordFailures($run))->toHaveCount(1)
+        ->and(wordFailures($run)[0])->toContain('"superuser" is a word GLOSSARY.md says to avoid: say "Admin"');
+});

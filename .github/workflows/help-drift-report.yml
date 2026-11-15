@@ -186,6 +186,18 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # The Glossary Check reads Stockist's GLOSSARY.md for the terms both apps share (fmm#56).
+      - name: Check out Stockist's glossary at main
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/stockist
+          ref: main
+          token: ${{ secrets.FMM_READ_TOKEN }}
+          path: .launch-checks/stockist
+          sparse-checkout: GLOSSARY.md
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
       # GitHub makes a label the first time an issue carries it; making it here first gives it
       # its colour and description, and does nothing once it exists.
       - name: Make sure the report's label exists
@@ -213,6 +225,7 @@ jobs:
           php artisan help:drift-report \
             --main-project=.launch-checks/firstmilemanager \
             --main-project-ref=main \
+            --stockist=.launch-checks/stockist \
             "${month[@]}" \
             --take-pictures \
             --picture-artefacts="$GITHUB_WORKSPACE/picture-check" \
