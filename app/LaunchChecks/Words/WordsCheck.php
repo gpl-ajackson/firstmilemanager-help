@@ -86,11 +86,23 @@ final readonly class WordsCheck implements Check
         }
 
         // A term both apps define is avoided by Stockist's avoid words too, as First Mile
-        // Manager names it, so help never calls it what Stockist says not to (fmm#56).
+        // Manager names it, so help never calls it what Stockist says not to (fmm#56). Not a
+        // word First Mile Manager's own names are made of, though: Stockist avoids "manager" for
+        // its Admin, but Transport Manager and First Mile Manager itself can't be written without it.
+        $ownWords = ['first' => true, 'mile' => true, 'manager' => true];
+        foreach (array_keys($glossary->terms) as $name) {
+            foreach (preg_split('/[\s-]+/', mb_strtolower($name)) ?: [] as $part) {
+                $ownWords[$part] = true;
+            }
+        }
         $sharedAvoid = [];
         if ($stockist !== null) {
             foreach (GlossaryCheck::sharedTerms($glossary, $stockist) as $name => $theirs) {
-                $sharedAvoid[$name] = $theirs->avoid;
+                $sharedAvoid[$name] = array_values(array_filter($theirs->avoid, function (string $word) use ($ownWords): bool {
+                    $parts = preg_split('/[\s-]+/', mb_strtolower(trim((string) preg_replace('/\(.*\)/', '', $word)))) ?: [];
+
+                    return array_diff($parts, array_keys($ownWords)) !== [];
+                }));
             }
         }
 

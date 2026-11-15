@@ -249,3 +249,17 @@ it('doesn\'t fail Stockist\'s avoid words for a term First Mile Manager doesn\'t
 
     expect(wordFailures($run))->toBe([]);
 });
+
+it('doesn\'t fail a Stockist avoid word that First Mile Manager\'s own names are made of', function () {
+    // Stockist avoids "manager" for its Admin; First Mile Manager's roles and name use it.
+    $project = mainProject()->glossary([
+        'Admin' => ['The owner\'s Staff Role.', ['superuser']],
+        'Transport Manager' => 'A Staff Role that keeps vehicles.',
+    ]);
+    $stockist = mainProject()->glossary(['Admin' => ['The owner\'s Staff Role.', ['Superuser', 'manager']]]);
+    $run = launchChecks(anArticle('Ask your Admin or Transport Manager in First Mile Manager, not the superuser.'))
+        ->against($project)->stockist($stockist)->styleGuide([])->run();
+
+    expect(wordFailures($run))->toHaveCount(1)
+        ->and(wordFailures($run)[0])->toContain('"superuser" is a word GLOSSARY.md says to avoid: say "Admin"');
+});
