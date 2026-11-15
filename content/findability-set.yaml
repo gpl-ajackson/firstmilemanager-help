@@ -1,4 +1,21 @@
 # The Findability Set (Launch Check 10): readers' questions in their own words, each with the
 # answer search must show in its top three results. Each Product Area's drafting ticket adds its
 # questions under its own heading.
-[]
+
+# People (fmm#57)
+- question: log in
+  answer: /articles/sign-in-to-first-mile-manager
+- question: forgot my password
+  answer: /articles/sign-in-to-first-mile-manager#reset-password
+- question: add a driver
+  answer: /articles/invite-people-to-first-mile-manager
+- question: invite someone by text message
+  answer: /articles/invite-people-to-first-mile-manager
+- question: what can a transport manager do
+  answer: /articles/staff-roles-in-first-mile-manager
+- question: worker type
+  answer: /glossary/worker-type
+
+# Settings (fmm#57)
+- question: sign up
+  answer: /articles/get-started-with-first-mile-manager

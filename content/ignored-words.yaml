@@ -2,4 +2,9 @@
 # which the Words check (Launch Check 5) skips everywhere. Each line says the sense help uses.
 # Add a word only when it keeps failing a correct use; one that GLOSSARY.md no longer lists is
 # reported by the Words check. To name an avoid word as the wrong word, quote it instead.
-[]
+
+# A web link, such as an invitation's "link to accept" (GLOSSARY.md avoids it for a Connection).
+- link
+# The person who set the business up, as Settings and the People list label them (GLOSSARY.md
+# avoids it as a name for the Admin role).
+- owner
