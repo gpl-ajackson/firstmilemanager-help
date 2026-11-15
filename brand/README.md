@@ -1,27 +1,57 @@
-# Stockist WMS brand (Bay)
+# First Mile Manager brand
 
-AJ chose the **Bay** brand on 23 October 2026. The full brand book is the Stockist WMS design system (https://claude.ai/artifact/93adEmbT2XDEMwk1q9qwd6). This folder holds what the support site needs to use it. The marketing site (`stockist-marketing-site`) and the staff app (`stockist`) use the same files.
+The brand the marketing site, the help centre and the app all use. First Mile Manager stands on its own. It is not shown as part of any other product's brand.
 
-## Where it applies on this site
+## Name logo
 
-- **Stockist's own pages:** the public help centre for 3PL staff, the request desk, service status, release notes and the subscription pages carry the Stockist WMS brand.
-- **Branded help centres:** each 3PL's help centre for its clients carries **only that 3PL's** name, logo and colours (plan rule 14). It never loads `tokens.css`, the Stockist logo, the Stockist favicon or the Stockist fonts, and it has no "powered by" line. Give it a neutral base theme that the 3PL's colours and logo go on top of.
+| On light backgrounds | On dark backgrounds |
+| --- | --- |
+| ![First Mile Manager on light](logo/fmm-lockup-light.svg) | ![First Mile Manager on dark](logo/fmm-lockup-dark.svg) |
+| ![Mark on light](logo/fmm-mark-light.svg) | ![Mark on dark](logo/fmm-mark-dark.svg) |
 
-## Files
+- `logo/fmm-lockup-light.svg` and `logo/fmm-lockup-dark.svg`: the mark and the name. Use these wherever there is room.
+- `logo/fmm-mark-light.svg` and `logo/fmm-mark-dark.svg`: the mark alone, for favicons, app icons and tight spaces.
 
-- `tokens.css`: every colour, spacing, radius and font as a CSS custom property (`--sk-page`, `--sk-ink`, `--sk-floor`, `--sk-success` and so on). It is light by default and switches to dark with `prefers-color-scheme`, or you can force a theme with `data-theme="light"` or `data-theme="dark"` on `<html>`. It also declares the fonts from `/fonts/`, so copy `fonts/` to `public/fonts/`.
-- `tokens.json`: the same tokens as data, with a usage note on each.
-- `logos/`: `stockist-wms-lockup-light.svg` is the default header logo, and `-dark.svg` is for the dark theme. There are also the mark on its own, one-colour versions and a stacked lock-up.
-- `icons/`: favicons, app icons and `og-default.png`, the 1200×630 sharing image.
-- `fonts/`: Barlow Condensed (headings), Atkinson Hyperlegible Next (text) and Atkinson Hyperlegible Mono (codes), with their SIL Open Font Licences. Self-host them; don't load Google Fonts.
+The mark is a pickup point with a route heading out. That is the first mile: collect from the client, send it on.
 
-## Rules to keep
+The name is set in Atkinson Hyperlegible Next Bold and turned into outlines, so the logo needs no font. Atkinson Hyperlegible is under the SIL Open Font License, which allows this. Write the name in full as "First Mile Manager". "FMM" is fine in internal notes, never on a customer-facing page.
 
-- **Floor yellow** (`--sk-floor`) is only ever a fill, with `--sk-on-floor` text on it. Never use yellow for text or icons on a light background, and never use it for a status.
-- **Warning is orange** (`--sk-warning`). Every status shows a word as well as a colour.
-- **Headings:** article and page headings use Barlow Condensed. Section headings on landing pages are in capitals, and article titles are in sentence case.
-- **Body text** is Atkinson Hyperlegible Next at 16px. Location codes, order numbers and SKUs use the mono face.
-- **Links** are `--sk-link` and always underlined. Keyboard focus uses `--sk-focus-ring`.
-- **Corners** are square-shouldered: 3px on badges, 6px on buttons and inputs, 10px on cards.
-- **Voice:** plain UK English in 3PL words from the product's `GLOSSARY.md`. The help centre uses the office register: full sentences, numbered steps, and the fix in every error ("Location A1-03-B is full. Choose another location or split the pallet."). Never use "seamless", "powerful" or exclamation marks.
-- **Screenshots** show the Trentside Logistics demo only. Screenshots of client-facing screens show Trentside's brand, not Stockist's.
+Keep clear space around the logo of at least half the mark's height. Do not stretch it, recolour it, or put it on a busy picture.
+
+## Colour
+
+One accent: **Route teal `#0D9488`**. Everything else is ink and paper.
+
+| Name | Hex | Use |
+| --- | --- | --- |
+| Route teal | `#0D9488` | Buttons, highlights, icons, the mark |
+| Route teal (text) | `#0F766E` | Small accent text, such as links, on light backgrounds |
+| Ink | `#0F1A1E` | Text on light backgrounds, and text on a Route teal fill |
+| Paper | `#FFFFFF` | Light background |
+| Night | `#0B1215` | Dark background |
+
+Contrast (WCAG 2.2):
+
+| Pair | Ratio | Meets |
+| --- | --- | --- |
+| Route teal on Paper | 3.74 : 1 | AA for buttons, icons and large text |
+| Route teal on Night | 5.05 : 1 | AA for all text |
+| Ink on Route teal | 4.73 : 1 | AA for all text (button labels) |
+| Route teal (text) on Paper | 5.47 : 1 | AA for all text |
+| Ink on Paper | 17.69 : 1 | AAA |
+
+So: on light pages, use Route teal for fills and big type, and the text shade for small links. On dark pages, Route teal works for everything. Button labels on a Route teal fill are always Ink.
+
+Route teal means "this is First Mile Manager", not a status. Status colours (success, warning, danger) stay the standard green, orange and red, and success green should look clearly different from Route teal.
+
+The values are also in [`tokens.css`](tokens.css).
+
+## Voice
+
+We write for busy people at a loading bay, a desk or a van door. So:
+
+- Use short sentences and everyday words. Say "book a collection", not "create a consignment request".
+- Lead with what the reader can do or what has happened. Then add detail if it helps.
+- Use the words in the product's glossary, the same way every time.
+- Talk to the reader as "you" and about ourselves as "we". Be friendly and direct. No hype, no exclamation marks.
+- Never name another product to a reader who only uses First Mile Manager. Pages written for people who use both products may say how they work together.

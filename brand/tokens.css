@@ -1,103 +1,11 @@
 /*
- * Stockist WMS brand tokens (Bay). Light by default; dark with prefers-color-scheme,
- * or force a theme with data-theme="light" / data-theme="dark" on <html>.
- * Fonts are self-hosted from /fonts (SIL Open Font Licence).
+ * First Mile Manager brand colours. See brand/README.md for when to use each one.
+ * Route teal is the one accent. The other values are its text-safe shade and the neutrals.
  */
-@font-face { font-family: "Barlow Condensed"; src: url("/fonts/BarlowCondensed-SemiBold.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: "Barlow Condensed"; src: url("/fonts/BarlowCondensed-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: "Atkinson Hyperlegible Next"; src: url("/fonts/AtkinsonHyperlegibleNext-Variable.woff2") format("woff2"); font-weight: 200 800; font-style: normal; font-display: swap; }
-@font-face { font-family: "Atkinson Hyperlegible Next"; src: url("/fonts/AtkinsonHyperlegibleNext-Italic-Variable.woff2") format("woff2"); font-weight: 200 800; font-style: italic; font-display: swap; }
-@font-face { font-family: "Atkinson Hyperlegible Mono"; src: url("/fonts/AtkinsonHyperlegibleMono-Variable.woff2") format("woff2"); font-weight: 200 800; font-style: normal; font-display: swap; }
 :root {
-  --sk-page: #FFFFFF;
-  --sk-panel: #F2F3F5;
-  --sk-raised: #FFFFFF;
-  --sk-line: #D9DCE1;
-  --sk-line-strong: #80868F;
-  --sk-ink: #12151C;
-  --sk-ink-muted: #50555F;
-  --sk-floor: #FFC20E;
-  --sk-on-floor: #12151C;
-  --sk-floor-soft: #FFF3C4;
-  --sk-on-floor-soft: #12151C;
-  --sk-link: #12151C;
-  --sk-focus: #12151C;
-  --sk-success: #14743A;
-  --sk-success-soft: #E5F0E9;
-  --sk-warning: #B04A05;
-  --sk-warning-soft: #F6EBE4;
-  --sk-danger: #B8232A;
-  --sk-danger-soft: #F7E7E8;
-  --sk-info: #1F5BB5;
-  --sk-info-soft: #E6EDF7;
-  --sk-shadow-sm: 0 1px 2px #12151c14;
-  --sk-shadow-lg: 0 8px 24px -4px #12151c29;
-  --sk-focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #12151c, 0 0 0 6px #ffc20e;
-  --sk-space-1: 4px;
-  --sk-space-2: 8px;
-  --sk-space-3: 12px;
-  --sk-space-4: 16px;
-  --sk-space-6: 24px;
-  --sk-space-8: 32px;
-  --sk-space-12: 48px;
-  --sk-space-16: 64px;
-  --sk-radius-xs: 3px;
-  --sk-radius-sm: 6px;
-  --sk-radius-md: 10px;
-  --sk-font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
-  --sk-font-text: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --sk-font-code: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --sk-page: #0E1015;
-    --sk-panel: #181B22;
-    --sk-raised: #1F232B;
-    --sk-line: #2B3039;
-    --sk-line-strong: #6A707B;
-    --sk-ink: #F2F3F5;
-    --sk-ink-muted: #A3A9B4;
-    --sk-floor-soft: #33290A;
-    --sk-on-floor-soft: #FFD34D;
-    --sk-link: #FFD34D;
-    --sk-focus: #FFC20E;
-    --sk-success: #5BD28A;
-    --sk-success-soft: #1C332A;
-    --sk-warning: #FF9A52;
-    --sk-warning-soft: #392920;
-    --sk-danger: #FF8080;
-    --sk-danger-soft: #392428;
-    --sk-info: #7FAEFF;
-    --sk-info-soft: #222C3F;
-    --sk-shadow-sm: 0 1px 2px #00000099;
-    --sk-shadow-lg: 0 12px 28px -4px #000000cc;
-    --sk-focus-ring: 0 0 0 2px #0e1015, 0 0 0 4px #ffc20e;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --sk-page: #0E1015;
-  --sk-panel: #181B22;
-  --sk-raised: #1F232B;
-  --sk-line: #2B3039;
-  --sk-line-strong: #6A707B;
-  --sk-ink: #F2F3F5;
-  --sk-ink-muted: #A3A9B4;
-  --sk-floor-soft: #33290A;
-  --sk-on-floor-soft: #FFD34D;
-  --sk-link: #FFD34D;
-  --sk-focus: #FFC20E;
-  --sk-success: #5BD28A;
-  --sk-success-soft: #1C332A;
-  --sk-warning: #FF9A52;
-  --sk-warning-soft: #392920;
-  --sk-danger: #FF8080;
-  --sk-danger-soft: #392428;
-  --sk-info: #7FAEFF;
-  --sk-info-soft: #222C3F;
-  --sk-shadow-sm: 0 1px 2px #00000099;
-  --sk-shadow-lg: 0 12px 28px -4px #000000cc;
-  --sk-focus-ring: 0 0 0 2px #0e1015, 0 0 0 4px #ffc20e;
-  color-scheme: dark;
+  --fmm-route-teal: #0d9488;      /* the accent: buttons, highlights, the mark */
+  --fmm-route-teal-text: #0f766e; /* small accent text (links) on light backgrounds */
+  --fmm-ink: #0f1a1e;             /* text on light; text on a route teal fill */
+  --fmm-paper: #ffffff;           /* light background */
+  --fmm-night: #0b1215;           /* dark background */
 }

@@ -57,6 +57,7 @@
             </section>
         @endif
 
+        @if (count($areas) > 0)
         <section class="home-block home-areas">
             <h2 class="block-title">Product Areas</h2>
             <ul class="area-signs">
@@ -70,6 +71,7 @@
                 @endforeach
             </ul>
         </section>
+        @endif
 
         <div class="home-two">
             @if ($clientArticles->isNotEmpty() || $hasClientGlossary)
