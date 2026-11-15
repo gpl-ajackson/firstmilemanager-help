@@ -7,6 +7,7 @@ use App\LaunchChecks\ArticleFile;
 use App\LaunchChecks\Check;
 use App\LaunchChecks\CheckContext;
 use App\LaunchChecks\Findings;
+use App\LaunchChecks\Glossary\GlossaryCheck;
 use App\LaunchChecks\Glossary\MainGlossary;
 use App\LaunchChecks\WordPattern;
 
@@ -42,7 +43,7 @@ final readonly class WordsCheck implements Check
         $glossary = $context->mainProject->glossary();
         $ignored = IgnoredWords::read($context->contentPath, $findings);
         $words = [
-            ...$this->avoidWords($glossary, $ignored, $findings),
+            ...$this->avoidWords($glossary, $ignored, $findings, $context->stockistGlossary()),
             ...StyleGuide::bannedWords($context->styleGuidePath, $findings) ?? [],
         ];
         if ($words === []) {
@@ -78,10 +79,19 @@ final readonly class WordsCheck implements Check
      *
      * @return list<WrongWord>
      */
-    private function avoidWords(?MainGlossary $glossary, IgnoredWords $ignored, Findings $findings): array
+    private function avoidWords(?MainGlossary $glossary, IgnoredWords $ignored, Findings $findings, ?MainGlossary $stockist = null): array
     {
         if ($glossary === null) {
             return []; // the Glossary Check fails a checkout with no GLOSSARY.md
+        }
+
+        // A term both apps define is avoided by Stockist's avoid words too, as First Mile
+        // Manager names it, so help never calls it what Stockist says not to (fmm#56).
+        $sharedAvoid = [];
+        if ($stockist !== null) {
+            foreach (GlossaryCheck::sharedTerms($glossary, $stockist) as $name => $theirs) {
+                $sharedAvoid[$name] = $theirs->avoid;
+            }
         }
 
         $terms = [];
@@ -92,7 +102,7 @@ final readonly class WordsCheck implements Check
         $words = [];
         $avoided = [];
         foreach ($glossary->terms as $term) {
-            foreach ($term->avoid as $word) {
+            foreach (array_unique([...$term->avoid, ...$sharedAvoid[$term->name] ?? []]) as $word) {
                 $key = mb_strtolower($word);
                 $avoided[$key] = true;
                 if (isset($terms[$key]) || $ignored->has($word)) {

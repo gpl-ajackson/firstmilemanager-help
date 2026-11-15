@@ -31,6 +31,7 @@ final class LaunchChecksCommand extends Command
         {--main-project= : A checkout of gpl-ajackson/firstmilemanager at the ref under test (required)}
         {--main-project-ref=main : The ref that checkout is at, for the report}
         {--marketing-site= : A checkout of gpl-ajackson/firstmilemanager-marketing at main, whose src/data/site.ts the help centre\'s facts must match (Launch Check 9)}
+        {--stockist= : A checkout of gpl-ajackson/stockist at main, whose GLOSSARY.md is read for the terms both apps share (the Glossary and Words checks)}
         {--content= : The content folder (default: config help.content_path)}
         {--pictures= : The pictures folder, with each Picture\'s Recipe (default: config help.pictures_path)}
         {--templates= : The Article Templates folder (default: docs/writing/templates)}
@@ -106,6 +107,7 @@ final class LaunchChecksCommand extends Command
             marketingSitePath: ($marketingSite = $this->stringOption('marketing-site')) === null ? null : rtrim($marketingSite, '/'),
             checkPages: $this->option('pages') === true,
             speedAt: $speedAt,
+            stockistPath: ($stockist = $this->stringOption('stockist')) === null ? null : rtrim($stockist, '/'),
         ), $picturesOnly ? [PicturesCheck::class] : null);
 
         $ref = $this->stringOption('main-project-ref') ?? 'main';

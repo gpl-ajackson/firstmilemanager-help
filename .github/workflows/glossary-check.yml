@@ -70,6 +70,19 @@ jobs:
           path: .launch-checks/firstmilemanager
           persist-credentials: false
 
+      # The Glossary and Words checks read Stockist's GLOSSARY.md for the terms both apps share
+      # (fmm#56), with the same read-only key, which needs Contents: read on gpl-ajackson/stockist too.
+      - name: Check out Stockist's glossary at main
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/stockist
+          ref: main
+          token: ${{ secrets.FMM_READ_TOKEN }}
+          path: .launch-checks/stockist
+          sparse-checkout: GLOSSARY.md
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
       - name: Run the Glossary Check and post its findings
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -79,4 +92,5 @@ jobs:
           php artisan help:glossary-check \
             --main-project=.launch-checks/firstmilemanager \
             --main-project-ref="main ($commit)" \
+            --stockist=.launch-checks/stockist \
             --post-to="$REPOSITORY"

@@ -50,7 +50,7 @@ final readonly class DriftReport
             '',
             ...$this->sectionLines(),
             '<sub>Raised by the Help Drift Report workflow'.($this->links->runUrl === null ? '' : " ([this run]({$this->links->runUrl}))")
-                .'. Run it locally: `php artisan help:drift-report --main-project=<path to a stockist checkout with its history>`.</sub>',
+                .'. Run it locally: `php artisan help:drift-report --main-project=<path to a firstmilemanager checkout with its history> --stockist=<path to a stockist checkout>`.</sub>',
         ];
         $markdown = implode("\n", $lines)."\n";
 

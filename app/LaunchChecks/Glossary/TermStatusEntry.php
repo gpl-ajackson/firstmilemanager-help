@@ -15,5 +15,10 @@ final readonly class TermStatusEntry
         /** GlossaryTerm::fingerprint() of the definition its entries were last checked against. */
         public string $fingerprint,
         public int $line,
+        /**
+         * For a term Stockist's GLOSSARY.md has too: GlossaryTerm::fingerprint() of Stockist's
+         * definition when this term's entries and Articles were last checked against it.
+         */
+        public ?string $stockistFingerprint = null,
     ) {}
 }

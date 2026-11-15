@@ -12,6 +12,13 @@
 #                 Only on a Published term.
 #   fingerprint   GLOSSARY.md's definition when its entries were last checked against it. When the
 #                 definition changes, the Glossary Check reports it with the new fingerprint to set.
+#   stockist_fingerprint
+#                 only on a term Stockist's GLOSSARY.md has too (a shared term): Stockist's definition
+#                 when this term's entries and Articles were last checked against it, so help means
+#                 by it what Stockist means. A shared term without one fails the Glossary Check; a
+#                 change to Stockist's definition is reported with the new one to set. A Team Role
+#                 holds its own powers in each app, so a role's entry says what it does in First
+#                 Mile Manager and never contradicts what it is in Stockist.
 #
 # Built or not was judged from the main project's code after slice 0 (spec #57, 81a5430, 14
 # November 2026). FMM-only and Joint reach readers only as the Setup Type's two values, explained
@@ -30,10 +37,12 @@ Connection:
   status: Published
   product_area: Settings
   fingerprint: 7661502fbb01
+  stockist_fingerprint: '156131839347'
 Setup Type:
   status: Published
   product_area: Settings
   fingerprint: d4e544a53034
+  stockist_fingerprint: '2c73ff5e1214'
 'FMM-only':
   status: Internal
   product_area: Settings
@@ -46,6 +55,7 @@ Headless Team:
   status: Internal
   product_area: Settings
   fingerprint: 4a9b43a1d508
+  stockist_fingerprint: 'cfe3cf2c290b'
 
 # People, sign-ins and roles
 
@@ -57,26 +67,32 @@ Team Role:
   status: Published
   product_area: People
   fingerprint: cf0f6d372fb4
+  stockist_fingerprint: 'f1a5eb168927'
 Staff Role:
   status: Published
   product_area: People
   fingerprint: b0af68b1a5ee
+  stockist_fingerprint: 'ffaecb994e52'
 Client Role:
   status: Not built yet
   product_area: Clients
   fingerprint: 8e057634ce28
+  stockist_fingerprint: 'ffd56828f6fb'
 Admin:
   status: Published
   product_area: People
   fingerprint: 22d37b6ac24e
+  stockist_fingerprint: '73475651f256'
 Finance Manager:
   status: Published
   product_area: People
   fingerprint: 17bfb143861e
+  stockist_fingerprint: '58aa9337275d'
 Account Manager:
   status: Published
   product_area: People
   fingerprint: 5b6fe6e4bc84
+  stockist_fingerprint: 'db8759e3286a'
 Transport Manager:
   status: Published
   product_area: People
@@ -89,10 +105,12 @@ Warehouse Manager:
   status: Published
   product_area: People
   fingerprint: b0f6cab9f5c3
+  stockist_fingerprint: '7c8e8acb6a52'
 Warehouse Operative:
   status: Published
   product_area: People
   fingerprint: 1c8846185879
+  stockist_fingerprint: '5a5dfad38461'
 Worker Type:
   status: Published
   product_area: People
@@ -108,6 +126,7 @@ Client Status:
   status: Not built yet
   product_area: Clients
   fingerprint: bde2e23d05e6
+  stockist_fingerprint: 'cf663a82298d'
 Contact:
   status: Not built yet
   product_area: Clients
@@ -170,11 +189,14 @@ Outside Connection:
   status: Internal
   product_area: Settings
   fingerprint: 6e04aea80f57
+  stockist_fingerprint: '0394ccca7380'
 Demo Behaviour:
   status: Internal
   product_area: Settings
   fingerprint: 9fc64559fc60
+  stockist_fingerprint: '21b71aafd6b4'
 Demo Outbox:
   status: Internal
   product_area: Settings
   fingerprint: 92134528494c
+  stockist_fingerprint: '5c28c364d7d2'

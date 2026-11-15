@@ -22,6 +22,11 @@ use Symfony\Component\Yaml\Yaml;
  *       product_area: Inbound
  *       ahead: true                    only on a Published term
  *       fingerprint: 0a1b2c3d4e5f
+ *     Admin:
+ *       status: Published
+ *       product_area: People
+ *       fingerprint: 1a2b3c4d5e6f
+ *       stockist_fingerprint: 6f5e4d3c2b1a   a term Stockist's GLOSSARY.md has too: Stockist's definition, as last checked
  *
  * Each problem fails the Glossary Check as glossary.term-status-format, naming the term's line.
  */
@@ -29,7 +34,7 @@ final readonly class TermStatusList
 {
     public const FILE = 'term-status.yaml';
 
-    public const FIELDS = ['status', 'product_area', 'ahead', 'fingerprint'];
+    public const FIELDS = ['status', 'product_area', 'ahead', 'fingerprint', 'stockist_fingerprint'];
 
     /** @param  array<string, TermStatusEntry>  $entries  term => its Term Status, for the terms that read cleanly */
     private function __construct(
@@ -135,11 +140,16 @@ final readonly class TermStatusList
             $problem('fingerprint must be the 12 hex digits the Glossary Check gives'.$set);
         }
 
+        $stockistFingerprint = $fields['stockist_fingerprint'] ?? null;
+        if ($stockistFingerprint !== null && (! is_string($stockistFingerprint) || preg_match('/\A[0-9a-f]{12}\z/', $stockistFingerprint) !== 1)) {
+            $problem('stockist_fingerprint must be the 12 hex digits the Glossary Check gives, or left out');
+        }
+
         if ($problems > 0 || $status === null || $area === null || ! is_bool($ahead) || ! is_string($fingerprint)) {
             return null;
         }
 
-        return new TermStatusEntry($term, $status, $area, $ahead, $fingerprint, $line);
+        return new TermStatusEntry($term, $status, $area, $ahead, $fingerprint, $line, is_string($stockistFingerprint) ? $stockistFingerprint : null);
     }
 
     /** @param  list<string>  $lines */

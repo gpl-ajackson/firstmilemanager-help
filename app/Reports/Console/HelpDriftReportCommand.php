@@ -36,6 +36,7 @@ final class HelpDriftReportCommand extends Command
     protected $signature = 'help:drift-report
         {--main-project= : A checkout of gpl-ajackson/firstmilemanager at main, with its whole history (required)}
         {--main-project-ref=main : The branch that checkout is of, for the report}
+        {--stockist= : A checkout of gpl-ajackson/stockist at main, for the terms both glossaries share}
         {--content= : The content folder (default: config help.content_path)}
         {--pictures= : The pictures folder, with each Picture\'s Recipe (default: config help.pictures_path)}
         {--take-pictures : Retake every Picture from the main project\'s checkout and compare them (the Picture Check; installs and seeds Stockist)}
@@ -97,6 +98,7 @@ final class HelpDriftReportCommand extends Command
                 picturesPath: $this->stringOption('pictures'),
                 takePictures: $this->option('take-pictures') === true ? 'all' : null,
                 pictureArtefacts: $this->stringOption('picture-artefacts'),
+                stockistPath: ($stockist = $this->stringOption('stockist')) === null ? null : rtrim($stockist, '/'),
             ),
             links: new DriftLinks($supportSite, $this->stringOption('support-site-ref') ?? 'main', $commit, $this->stringOption('run-url')),
             stockist: $readToken === null ? null : new GitHubReader($readToken),

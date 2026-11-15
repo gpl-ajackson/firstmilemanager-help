@@ -35,6 +35,7 @@ final class ReleaseCheckCommand extends Command
         {--main-project-ref= : The ref that checkout is at, for the report (default: its commit)}
         {--last-release=origin/demo : Where the last FMM Release is in that checkout}
         {--date= : The FMM Release\'s date for the draft Release Note, YYYY-MM-DD (default: today in the UK)}
+        {--stockist= : A checkout of gpl-ajackson/stockist at main, whose GLOSSARY.md is read for the terms both apps share}
         {--marketing-site= : A checkout of gpl-ajackson/firstmilemanager-marketing at main, whose src/data/site.ts the help centre\'s facts must match (Launch Check 9)}
         {--content= : The content folder (default: config help.content_path)}
         {--pictures= : The pictures folder, with each Picture\'s Recipe (default: config help.pictures_path)}
@@ -82,6 +83,7 @@ final class ReleaseCheckCommand extends Command
                     takePictures: 'all',
                     pictureArtefacts: $this->stringOption('picture-artefacts'),
                     marketingSitePath: ($marketingSite = $this->stringOption('marketing-site')) === null ? null : rtrim($marketingSite, '/'),
+                    stockistPath: ($stockist = $this->stringOption('stockist')) === null ? null : rtrim($stockist, '/'),
                 ),
                 $lastRelease,
                 $date,
