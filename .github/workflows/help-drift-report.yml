@@ -1,0 +1,229 @@
+name: Help Drift Report (monthly)
+
+# The Help Drift Report (spec #30, user stories 148 and 149; plan S7 step 9): on the first
+# working day of each month (UK), one issue for the Content Owner listing where help may have
+# fallen behind First Mile Manager in the month that ended: Articles whose sources changed since their
+# Checked On, Source References that don't match both ways, main-project changes merged
+# without their help, Articles past their review date, Pictures that differ from main (every
+# Picture retaken), and the Glossary Check's reports (php artisan help:drift-report).
+#
+# It reads First Mile Manager only through its repository, never the app (rule 21): a
+# checkout of main with its whole history, and its issues and pull requests on GitHub, with the
+# read-only key FMM_READ_TOKEN. This repository's Help Proposals are read, and the issue
+# raised, with the workflow's own token.
+#
+# GitHub's schedule can't say "first working day", so it runs on the 1st to the 7th and asks
+# help:report-day first. Run it by hand (Actions › Help Drift Report › Run workflow) for any
+# month; a second run in a month adds its report to that month's issue as a comment.
+#
+# The Help Gaps Report (#67), raised by the help centre's server later the same day, finds the
+# month's issue by its label, help-drift-report, and marker, <!-- help-drift-report:YYYY-MM -->.
+
+on:
+  schedule:
+    # 06:00 UTC (6 or 7am in the UK) on the 1st to the 7th; the report-day job picks the day.
+    - cron: '0 6 1-7 * *'
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'The month to report on, YYYY-MM (leave empty for the month that just ended)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  report-day:
+    name: Is today the first working day?
+    if: github.event_name == 'schedule'
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    outputs:
+      first: ${{ steps.day.outputs.first }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, pgsql, intl, gd
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Ask whether the reports are raised today
+        id: day
+        run: |
+          answer=$(php artisan help:report-day)
+          echo "$answer"
+          case "$answer" in
+            yes*) echo "first=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "first=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+  help-drift-report:
+    name: Help Drift Report
+    needs: report-day
+    # By hand, always; on schedule, only on the first working day. (needs is skipped by hand.)
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.report-day.outputs.first == 'true') }}
+    # It retakes every Picture, so it runs where the Picture Check does: see pictures/README.md.
+    runs-on: ${{ vars.PICTURE_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    permissions:
+      contents: read
+      # To raise the month's issue (and add a re-run's report to it), with its label.
+      issues: write
+      # To read this repository's Help Proposals.
+      pull-requests: read
+
+    # As launch-checks.yml: the picture tool seeds Stockist's Trentside demo in Postgres to
+    # retake every Picture. The same services and job settings, so the two can share setup.
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: sail
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sail -d testing"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      meilisearch:
+        image: getmeili/meilisearch:v1.52.4
+        env:
+          MEILI_MASTER_KEY: ci-only-meilisearch-master-key
+          MEILI_NO_ANALYTICS: 'true'
+        ports:
+          - 7700:7700
+
+    # The job runs on the runner, so the services are on localhost. The key belongs to this
+    # job's own throwaway instance; it is not a secret.
+    env:
+      DB_HOST: 127.0.0.1
+      DB_DATABASE: testing
+      MEILISEARCH_HOST: http://127.0.0.1:7700
+      MEILISEARCH_KEY: ci-only-meilisearch-master-key
+
+    steps:
+      # The main project is private, so the report reads it with the read-only key AJ adds as a
+      # repository secret under ticket #32. Without it the report can't be made, and that fails.
+      - name: Check for the main project's read-only key
+        env:
+          FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
+        run: |
+          if [ -z "$FMM_READ_TOKEN" ]; then
+            echo "::error title=Missing secret FMM_READ_TOKEN (help#2)::The Help Drift Report reads the main project (gpl-ajackson/firstmilemanager) with the repository secret FMM_READ_TOKEN, a read-only key AJ adds under ticket #32 (Contents, Pull requests and Issues: read), and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          # The help centre's, and Stockist's own (bcmath, pcntl, posix) for the copy the picture
+          # tool runs.
+          extensions: pdo_pgsql, pgsql, intl, gd, bcmath, pcntl, posix
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Make the help centre's database
+        run: php artisan migrate --force
+
+      # The checks read every Article as the rebuild does, drawing its Mermaid diagrams with the
+      # pinned tool in tools/diagrams (Mermaid in Chromium through Playwright).
+      - name: Install the diagram tool and its Chromium
+        run: |
+          npm ci --prefix tools/diagrams --no-audit --no-fund
+          npx --prefix tools/diagrams playwright install --with-deps chromium
+          # The picture tool's camera uses the same pinned Playwright.
+          echo "NODE_PATH=$GITHUB_WORKSPACE/tools/diagrams/node_modules" >> "$GITHUB_ENV"
+
+      # The whole history, so the report can tell which cited plans and ADRs changed after each
+      # Article's Checked On.
+      - name: Check out the main project at main
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/firstmilemanager
+          ref: main
+          token: ${{ secrets.FMM_READ_TOKEN }}
+          path: .launch-checks/firstmilemanager
+          fetch-depth: 0
+          persist-credentials: false
+
+      # GitHub makes a label the first time an issue carries it; making it here first gives it
+      # its colour and description, and does nothing once it exists.
+      - name: Make sure the report's label exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          gh label create help-drift-report --repo "$REPOSITORY" --color 1D76DB \
+            --description "The monthly Help Drift Report (the Help Gaps Report finds it by this)" 2>/dev/null || true
+
+      - name: Make the report and raise it
+        env:
+          # This repository's Help Proposals, and the issue.
+          GITHUB_TOKEN: ${{ github.token }}
+          # The main project's issues (specs) and merged pull requests, read-only.
+          FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MONTH: ${{ inputs.month }}
+        run: |
+          month=()
+          if [ -n "$MONTH" ]; then
+            month=(--month="$MONTH")
+          fi
+          php artisan help:drift-report \
+            --main-project=.launch-checks/firstmilemanager \
+            --main-project-ref=main \
+            "${month[@]}" \
+            --take-pictures \
+            --picture-artefacts="$GITHUB_WORKSPACE/picture-check" \
+            --support-site-ref="$GITHUB_SHA" \
+            --run-url="$RUN_URL" \
+            --post-to="$REPOSITORY"
+
+      - name: Keep the Picture Check's before, after and difference images
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: picture-check
+          path: picture-check/
+          if-no-files-found: ignore

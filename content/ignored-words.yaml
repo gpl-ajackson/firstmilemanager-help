@@ -1,0 +1,5 @@
+# The Ignored Words: GLOSSARY.md avoid words that are also everyday English in another sense,
+# which the Words check (Launch Check 5) skips everywhere. Each line says the sense help uses.
+# Add a word only when it keeps failing a correct use; one that GLOSSARY.md no longer lists is
+# reported by the Words check. To name an avoid word as the wrong word, quote it instead.
+[]

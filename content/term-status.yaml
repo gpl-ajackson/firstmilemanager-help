@@ -1,0 +1,180 @@
+# The Term Status of every term in the main project's GLOSSARY.md (gpl-ajackson/firstmilemanager),
+# in GLOSSARY.md's order and under its section headings. Launch Check 4 (the Glossary Check) reads it.
+#
+#   status        Published: readers meet it on a screen of First Mile Manager as built, so it has a Glossary Entry.
+#                 Internal: readers never see it by name, so it is never published.
+#                 Not built yet: its feature isn't built; it is published the day the feature ships.
+#   product_area  its home Product Area: the area whose Articles use it, whose ticket (or Help
+#                 Proposal) writes its Glossary Entry, so no two write the same entry. A Published
+#                 term's area is on the Product Area list (product-areas.yaml).
+#   ahead         true when its entries say less than GLOSSARY.md, because GLOSSARY.md already
+#                 describes a later slice: the Glossary Check reports it until the rest ships.
+#                 Only on a Published term.
+#   fingerprint   GLOSSARY.md's definition when its entries were last checked against it. When the
+#                 definition changes, the Glossary Check reports it with the new fingerprint to set.
+#
+# Built or not was judged from the main project's code after slice 0 (spec #57, 81a5430, 14
+# November 2026). FMM-only and Joint reach readers only as the Setup Type's two values, explained
+# in its entry; the Headless Team is never named to its Operator. The demo's terms are for
+# whoever runs the demo, not for readers. A main-project change that adds, renames or changes a
+# term sets its Term Status here in its help pull request (the main project's
+# docs/agents/help-content.md).
+
+# Operators and their Connection to Stockist
+
+Operator:
+  status: Published
+  product_area: Settings
+  fingerprint: ce66b9572065
+Connection:
+  status: Published
+  product_area: Settings
+  fingerprint: 7661502fbb01
+Setup Type:
+  status: Published
+  product_area: Settings
+  fingerprint: d4e544a53034
+'FMM-only':
+  status: Internal
+  product_area: Settings
+  fingerprint: 4b6e6ce0e03c
+Joint:
+  status: Internal
+  product_area: Settings
+  fingerprint: 8a117e439ec8
+Headless Team:
+  status: Internal
+  product_area: Settings
+  fingerprint: 4a9b43a1d508
+
+# People, sign-ins and roles
+
+'Sign-in':
+  status: Published
+  product_area: People
+  fingerprint: 197fee40dfe7
+Team Role:
+  status: Published
+  product_area: People
+  fingerprint: cf0f6d372fb4
+Staff Role:
+  status: Published
+  product_area: People
+  fingerprint: b0af68b1a5ee
+Client Role:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: 8e057634ce28
+Admin:
+  status: Published
+  product_area: People
+  fingerprint: 22d37b6ac24e
+Finance Manager:
+  status: Published
+  product_area: People
+  fingerprint: 17bfb143861e
+Account Manager:
+  status: Published
+  product_area: People
+  fingerprint: 5b6fe6e4bc84
+Transport Manager:
+  status: Published
+  product_area: People
+  fingerprint: 42c65a446693
+Driver:
+  status: Published
+  product_area: People
+  fingerprint: 907b51eed3e0
+Warehouse Manager:
+  status: Published
+  product_area: People
+  fingerprint: b0f6cab9f5c3
+Warehouse Operative:
+  status: Published
+  product_area: People
+  fingerprint: 1c8846185879
+Worker Type:
+  status: Published
+  product_area: People
+  fingerprint: 95c8df42ffe2
+
+# Clients
+
+Client:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: f4aa80be315a
+Client Status:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: bde2e23d05e6
+Contact:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: 55a99aa94934
+Collection Address:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: ac4889d6de17
+Invoice Frequency:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: 209729eecc8f
+Difference Rules:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: d63e56a9df93
+Shadow Client:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: 5796177b6637
+Client Link:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: 696afa6386d6
+Sure Match:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: 485bfc01b94c
+Link Review:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: d4e6ddd58edb
+'Take-over':
+  status: Not built yet
+  product_area: Clients
+  fingerprint: 4fe38d00ec6b
+Waiting for Stockist:
+  status: Not built yet
+  product_area: Clients
+  fingerprint: 360bc46b28eb
+
+# Charges and invoices
+
+Delivery Service:
+  status: Not built yet
+  product_area: Billing
+  fingerprint: ddd6e1aeb551
+Collections Rate Card:
+  status: Not built yet
+  product_area: Billing
+  fingerprint: 6637ceb87481
+Collections Invoice:
+  status: Not built yet
+  product_area: Billing
+  fingerprint: 9143b9e4146e
+
+# The demo
+
+Outside Connection:
+  status: Internal
+  product_area: Settings
+  fingerprint: 6e04aea80f57
+Demo Behaviour:
+  status: Internal
+  product_area: Settings
+  fingerprint: 9fc64559fc60
+Demo Outbox:
+  status: Internal
+  product_area: Settings
+  fingerprint: 92134528494c

@@ -1,0 +1,156 @@
+name: CI
+
+# On main it runs only as part of deploy.yml, which deploys when this and the Launch Checks pass,
+# so a merge is checked once.
+on:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+# Jobs here and in every workflow run on the runner the repository variable CI_RUNNER names: the
+# Hetzner runners' label (`hetzner`, stockist's ops/ci-runner/README.md) or, when it is unset,
+# GitHub's own `ubuntu-latest`. Clearing the variable moves CI back to GitHub without a code change.
+
+# A new push to a pull request cancels that pull request's run in progress. Runs on main each
+# get their own group, so every merge is checked. The group is named here rather than from
+# github.workflow, which is the caller's name when deploy.yml calls this.
+concurrency:
+  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  # The cheap checks run side by side without Postgres; the tests wait for them, so a style or
+  # type failure is reported in about a minute.
+  checks:
+    name: ${{ matrix.check.name }}
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        check:
+          - name: Code Style (Pint)
+            run: composer lint:check
+          - name: Static Analysis (PHPStan)
+            run: composer types:check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, pgsql, intl, gd
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: ${{ matrix.check.name }}
+        run: ${{ matrix.check.run }}
+
+  # Pest on Postgres and a real Meilisearch, as the help centre's server runs. Tests publish
+  # fixture content folders through help:rebuild (which fills the search index) and request
+  # pages as a reader. Search tests fail, never skip, when Meilisearch can't be reached.
+  tests:
+    name: Tests (Pest, Postgres, Meilisearch)
+    needs: checks
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: sail
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sail -d testing"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      meilisearch:
+        image: getmeili/meilisearch:v1.52.4
+        env:
+          MEILI_MASTER_KEY: ci-only-meilisearch-master-key
+          MEILI_NO_ANALYTICS: 'true'
+        ports:
+          - 7700:7700
+
+    # Both the rebuild and Pest reach the services on localhost (the job runs on the runner, not
+    # in a container). Real env vars win over phpunit.xml's (no force="true"). The key belongs to
+    # CI's own throwaway instance; it is not a secret.
+    env:
+      DB_HOST: 127.0.0.1
+      MEILISEARCH_HOST: http://127.0.0.1:7700
+      MEILISEARCH_KEY: ci-only-meilisearch-master-key
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, pgsql, intl, gd
+          tools: composer:v2
+          coverage: none
+
+      # The CI_RUNNER server has no Node of its own, as with PHP, so it comes from here.
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          cp .env.example .env
+          php artisan key:generate
+
+      # Layout tests (tests/Support/BrowserLayout.php) lay pages out in headless Chromium through
+      # Playwright. Installed globally, so the site keeps no package.json; NODE_PATH lets the
+      # test script require it.
+      - name: Install Playwright and Chromium for the layout tests
+        run: |
+          npm install --global playwright@1.64.1
+          playwright install --with-deps chromium
+          echo "NODE_PATH=$(npm root --global)" >> "$GITHUB_ENV"
+
+      # The content rebuild draws Mermaid diagrams with the pinned tool in tools/diagrams, in the
+      # same Chromium (the tool pins the same Playwright as above). The Launch Checks' page checks
+      # take Playwright and axe-core from there too.
+      - name: Install the diagram tool
+        run: npm ci --prefix tools/diagrams --no-audit --no-fund
+
+      - name: Wait for Meilisearch
+        run: |
+          for _ in $(seq 1 30); do
+            curl --silent --fail http://127.0.0.1:7700/health && exit 0
+            sleep 1
+          done
+          echo "Meilisearch did not become healthy on port 7700" >&2
+          exit 1
+
+      - name: Run the content rebuild over the repository's content folder
+        run: php artisan migrate --force && php artisan help:rebuild
+        env:
+          DB_DATABASE: testing
+
+      - name: Run Pest
+        run: php artisan test

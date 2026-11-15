@@ -1,0 +1,92 @@
+name: Deploy
+
+# Merged means live (spec #30 user stories 129 to 132, ADR-0003, ADR-0004, #58): every push to
+# main runs CI and the Launch Checks once, and only when every one of their jobs passed does the
+# deploy job ask Forge to deploy that commit to help.firstmilemanager.co.uk. A failing check stops it
+# there: nothing is deployed. docs/deploying.md says how a deploy works.
+#
+# Forge deploys on its own once asked (deploy/forge-deploy.sh is its script): zero-downtime, so a
+# failed step leaves the old version serving, and Forge emails AJ. This workflow doesn't wait for
+# the result.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+
+  launch-checks:
+    name: Launch Checks
+    uses: ./.github/workflows/launch-checks.yml
+    # The Launch Checks read the main project and the marketing site with FMM_READ_TOKEN.
+    secrets: inherit
+    # What the called job asks for (it comments on pull requests; on main there is none).
+    permissions:
+      contents: read
+      pull-requests: write
+
+  deploy:
+    name: Deploy to help.firstmilemanager.co.uk
+    needs: [ci, launch-checks]
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 5
+
+    # One deploy at a time, and a running one is never cancelled. A deploy waiting its turn is
+    # replaced by a newer commit's, which holds it anyway.
+    concurrency:
+      group: deploy-help-centre
+      cancel-in-progress: false
+
+    steps:
+      - name: Check for the deploy hook
+        env:
+          HELP_DEPLOY_HOOK_URL: ${{ secrets.HELP_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HELP_DEPLOY_HOOK_URL" ]; then
+            echo "::error title=Missing secret HELP_DEPLOY_HOOK_URL (ticket #33)::The deploy asks Forge to deploy through its deploy hook, held in the repository secret HELP_DEPLOY_HOOK_URL that AJ adds under ticket #33, and it is missing, so nothing was deployed. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            exit 1
+          fi
+
+      # Forge deploys the commit it is given, so a deploy never goes backwards: when main has
+      # moved on while this commit was being checked, the newer commit's own run deploys it once
+      # its checks pass, and this one stands aside.
+      - name: Make sure this is still main's newest commit
+        id: newest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          newest=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          if [ "$newest" = "$GITHUB_SHA" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice title=Not deployed: main has moved on::main is now at $newest, newer than $GITHUB_SHA. Its own run deploys it, with this change in it, once its checks pass."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The hook's address is a secret (anyone holding it can start a deploy), so it is never
+      # printed: curl names only the error. A POST starts the deploy and answers at once.
+      - name: Ask Forge to deploy this commit
+        if: steps.newest.outputs.deploy == 'true'
+        env:
+          HELP_DEPLOY_HOOK_URL: ${{ secrets.HELP_DEPLOY_HOOK_URL }}
+        run: |
+          case "$HELP_DEPLOY_HOOK_URL" in
+            *\?*) join='&' ;;
+            *) join='?' ;;
+          esac
+          curl --fail --silent --show-error --output /dev/null \
+            --connect-timeout 10 --max-time 30 --retry 2 \
+            --request POST \
+            "${HELP_DEPLOY_HOOK_URL}${join}forge_deploy_branch=main&forge_deploy_commit=${GITHUB_SHA}"
+          {
+            echo "### Deploy started"
+            echo
+            echo "Forge is deploying \`${GITHUB_SHA}\` to https://help.firstmilemanager.co.uk. If a step fails, the old version keeps serving and Forge emails AJ."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         defaultTestSuite="Feature"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <!-- The picture tool against a real Stockist: minutes, not seconds, so not in the default
+             run; pictures/README.md says how to run them. -->
+        <testsuite name="Pictures">
+            <directory>tests/Pictures</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BROADCAST_CONNECTION" value="null"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="CACHE_LIMITER_STORE" value="array"/>
+        <!-- Postgres, as in production. Locally each worktree sets its own DB_DATABASE; CI uses a service container. -->
+        <env name="DB_CONNECTION" value="pgsql"/>
+        <env name="DB_HOST" value="pgsql"/>
+        <env name="DB_PORT" value="5432"/>
+        <env name="DB_DATABASE" value="testing"/>
+        <env name="DB_USERNAME" value="sail"/>
+        <env name="DB_PASSWORD" value="password"/>
+        <env name="DB_URL" value=""/>
+        <env name="MAIL_MAILER" value="array"/>
+        <!-- A real Meilisearch (spec #30): CI's service container, or your own instance via
+             MEILISEARCH_HOST and MEILISEARCH_KEY. Tests fail, never skip, when it can't be reached. -->
+        <env name="MEILISEARCH_HOST" value="http://127.0.0.1:7700"/>
+        <env name="MEILISEARCH_KEY" value=""/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- These win over values the shell exports (a cloud session exports .env.example's, such as
+             DB_CONNECTION=sqlite). DB_HOST and DB_DATABASE stay overridable, for CI and per-worktree databases. -->
+        <server name="APP_ENV" value="testing" force="true"/>
+        <server name="CACHE_STORE" value="array" force="true"/>
+        <server name="CACHE_LIMITER_STORE" value="array" force="true"/>
+        <server name="DB_CONNECTION" value="pgsql" force="true"/>
+        <server name="MAIL_MAILER" value="array" force="true"/>
+        <!-- Tests replace the index on every publish, so they never touch a development index. -->
+        <server name="MEILISEARCH_INDEX" value="testing" force="true"/>
+        <server name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <server name="SESSION_DRIVER" value="array" force="true"/>
+    </php>
+</phpunit>

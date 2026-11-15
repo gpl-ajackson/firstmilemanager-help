@@ -1,0 +1,206 @@
+name: Release Check
+
+# The Release Check (ADR-0003; spec #30 user story 145), run by hand before a FMM Release:
+# AJ promoting the main project's demo branch. help:release-check lists every main-project pull
+# request merged since the last release (origin/demo) with its help status, shows the draft
+# Release Note from the Next Release folder, and runs the Launch Checks with every Picture
+# retaken against the version being released. The run's summary is the Release Check; the run
+# is red until help is complete for this release.
+#
+# First Mile Manager is read only through its repository (rule 21): a checkout at the version being
+# released, with its whole history, and its pull requests on GitHub with the read-only key.
+#
+# The job's setup is launch-checks.yml's, step for step (agreed with the Help Drift Report's
+# workflow, #66), so the three can share one setup later.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: The main project's version being released (a branch, tag or commit of gpl-ajackson/firstmilemanager)
+        default: main
+        required: true
+      last_release:
+        description: Where the last FMM Release is in that checkout (origin/demo; before the first promotion, the commit last released)
+        default: origin/demo
+        required: true
+      date:
+        description: The release's date for the draft Release Note, YYYY-MM-DD (empty for today in the UK)
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  release-check:
+    name: Release Check
+    # It retakes every Picture, so it runs where the Picture Check does: see pictures/README.md.
+    runs-on: ${{ vars.PICTURE_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    permissions:
+      contents: read
+      # To read this repository's Help Proposals (its pull requests) with the workflow's own token.
+      pull-requests: read
+
+    # Launch Check 12 seeds Stockist's Trentside demo in Postgres to retake every Picture. Launch
+    # Check 10 (Findability) loads the content into the help centre's own database (in a
+    # transaction it rolls back) and searches it in a fresh Meilisearch index.
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: sail
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sail -d testing"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      meilisearch:
+        image: getmeili/meilisearch:v1.52.4
+        env:
+          MEILI_MASTER_KEY: ci-only-meilisearch-master-key
+          MEILI_NO_ANALYTICS: 'true'
+        ports:
+          - 7700:7700
+
+    # The job runs on the runner, so the services are on localhost. The key belongs to this
+    # job's own throwaway instance; it is not a secret.
+    env:
+      DB_HOST: 127.0.0.1
+      DB_DATABASE: testing
+      MEILISEARCH_HOST: http://127.0.0.1:7700
+      MEILISEARCH_KEY: ci-only-meilisearch-master-key
+
+    steps:
+      - name: Name the files the steps share
+        run: echo "RELEASE_CHECK=$RUNNER_TEMP/release-check.md" >> "$GITHUB_ENV"
+
+      # The main project is private, so the check reads it with the read-only key AJ adds as a
+      # repository secret under ticket #32. Without it the check can't run, and that fails.
+      - name: Check for the main project's read-only key
+        env:
+          FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
+        run: |
+          if [ -z "$FMM_READ_TOKEN" ]; then
+            echo "::error title=Missing secret FMM_READ_TOKEN (help#2)::The Release Check reads the main project (gpl-ajackson/firstmilemanager) and its pull requests with the repository secret FMM_READ_TOKEN, a read-only key AJ adds under ticket #32, and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          # The help centre's, and Stockist's own (bcmath, pcntl, posix) for the copy the picture
+          # tool runs.
+          extensions: pdo_pgsql, pgsql, intl, gd, bcmath, pcntl, posix
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          cp .env.example .env
+          php artisan key:generate
+
+      # The Findability check rebuilds the content into the help centre's tables to search it.
+      - name: Make the help centre's database
+        run: php artisan migrate --force
+
+      # Check 1 reads every Article as the rebuild does, drawing its Mermaid diagrams with the
+      # pinned tool in tools/diagrams (Mermaid in Chromium through Playwright).
+      - name: Install the diagram tool and its Chromium
+        run: |
+          npm ci --prefix tools/diagrams --no-audit --no-fund
+          npx --prefix tools/diagrams playwright install --with-deps chromium
+          # The picture tool's camera uses the same pinned Playwright.
+          echo "NODE_PATH=$GITHUB_WORKSPACE/tools/diagrams/node_modules" >> "$GITHUB_ENV"
+
+      # The whole history, so origin/demo (the last FMM Release) and every merge since are there.
+      - name: Check out the main project at the version being released
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/firstmilemanager
+          ref: ${{ inputs.release }}
+          token: ${{ secrets.FMM_READ_TOKEN }}
+          path: .launch-checks/firstmilemanager
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Launch Check 9 compares the help centre's facts (content/facts.yaml) with the marketing
+      # site's src/data/site.ts at main, read with the same read-only key.
+      - name: Check out the marketing site at main
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/firstmilemanager-marketing
+          ref: main
+          token: ${{ secrets.FMM_READ_TOKEN }}
+          path: .launch-checks/marketing-site
+          persist-credentials: false
+
+      - name: Run the Release Check
+        env:
+          RELEASE: ${{ inputs.release }}
+          LAST_RELEASE: ${{ inputs.last_release }}
+          RELEASE_DATE: ${{ inputs.date }}
+          # The main project's pull requests, and its issues that Source References cite.
+          FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
+          # This repository's Help Proposals, and the Article Owners' GitHub accounts.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          date=()
+          if [ -n "$RELEASE_DATE" ]; then
+            date=(--date="$RELEASE_DATE")
+          fi
+          php artisan help:release-check \
+            --main-project=.launch-checks/firstmilemanager \
+            --main-project-ref="$RELEASE" \
+            --last-release="$LAST_RELEASE" \
+            --marketing-site=.launch-checks/marketing-site \
+            "${date[@]}" \
+            --check-owner-logins \
+            --picture-artefacts="$GITHUB_WORKSPACE/picture-check" \
+            --markdown="$RELEASE_CHECK"
+
+      - name: Show the Release Check as the run's summary
+        if: always()
+        run: |
+          if [ -s "$RELEASE_CHECK" ]; then
+            cat "$RELEASE_CHECK" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '## Release Check\n\n**Could not run:** see the job log.\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Keep the Release Check
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-check
+          path: ${{ env.RELEASE_CHECK }}
+          if-no-files-found: ignore
+
+      - name: Keep the Picture Check's before, after and difference images
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: picture-check
+          path: picture-check/
+          if-no-files-found: ignore
