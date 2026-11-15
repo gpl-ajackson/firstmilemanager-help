@@ -27,7 +27,7 @@ Every nightly, five-minute and monthly job runs from Laravel's scheduler, which 
 
 Each step takes minutes of work. The longest waits are while Forge makes the server and while the first deploy runs the content rebuild.
 
-1. **Make the server.** In Forge, make a Laravel VPS in London (about 2 GB) with PHP 8.4 and Postgres. It must never be the Stockist dev and demo server, and must share nothing with Stockist (rule 21, ADR-0004).
+1. **Make the server.** In Forge, make a Laravel VPS in London (about 2 GB) with PHP 8.4 and Postgres. It is the same server as Stockist's help centre (ADR-0006), but never the Stockist or First Mile Manager dev and demo server, and the help centre shares nothing with either app (rule 21, ADR-0004). `docs/putting-it-live.md` adds this site to it.
 2. **Install Meilisearch** v1.52.4 on the server with a new master key. It listens only on the server itself, and port 7700 is never open to the internet.
 3. **Close the firewall** to everything but Cloudflare. Web traffic is accepted only from the ranges in `config/trustedproxy.php`.
 4. **Make the site** `help.firstmilemanager.co.uk` in Forge, from `gpl-ajackson/firstmilemanager-help` at `main`, with zero-downtime deployments. Paste `deploy/forge-deploy.sh` into its deploy script box, and install Chromium for the `forge` user at the version `tools/diagrams/package.json` pins (`docs/deploying.md`, "Chromium and Playwright").
