@@ -19,7 +19,7 @@
         <meta name="robots" content="noindex">
     @endif
     <link rel="preload" href="{{ Asset::url('fonts/AtkinsonHyperlegibleNext-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ Asset::url('fonts/BarlowCondensed-Bold.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ Asset::url('css/brand.css') }}">
     <link rel="stylesheet" href="{{ Asset::url('css/tokens.css') }}">
     <link rel="stylesheet" href="{{ Asset::url('css/site.css') }}">
     {{-- The site's one small script (public/js/site.js): it only improves pages that work without it.
@@ -40,8 +40,8 @@
         <div class="wrap">
             <a class="logo-link" href="/">
                 <picture>
-                    <source srcset="{{ Asset::url('images/stockist-wms-lockup-dark.svg') }}" media="(prefers-color-scheme: dark)">
-                    <img src="{{ Asset::url('images/stockist-wms-lockup-light.svg') }}" alt="Stockist WMS" width="152" height="30">
+                    <source srcset="{{ Asset::url('images/fmm-lockup-dark.svg') }}" media="(prefers-color-scheme: dark)">
+                    <img src="{{ Asset::url('images/fmm-lockup-light.svg') }}" alt="First Mile Manager" width="195" height="30">
                 </picture>
                 <span class="logo-sub">Help centre</span>
             </a>
@@ -50,11 +50,18 @@
                 <a href="/whats-new">What’s new</a>
                 @if ($facts)
                     <a class="about" href="{{ $facts->url }}">About First Mile Manager</a>
-                    <span class="badge badge-stage">{{ $facts->stage }}</span>
                 @endif
             </nav>
         </div>
     </header>
+    {{-- Until alpha the facts' stage is "Early access", and every page says so (fmm#56). --}}
+    @if ($facts?->isEarlyAccess())
+        <aside class="early-access" aria-label="Early access">
+            <div class="wrap">
+                <p>{{ $facts->name }} is in early access. <a href="{{ $facts->page('/early-access') }}">Ask for early access</a></p>
+            </div>
+        </aside>
+    @endif
 
     {{-- A wide page (the help home) lays out its own full-width bands, each with its own wrap. --}}
     <main id="main" @class(['wrap' => ! $wide, 'main-wide' => $wide])>

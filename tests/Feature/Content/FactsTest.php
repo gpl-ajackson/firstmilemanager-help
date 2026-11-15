@@ -4,31 +4,40 @@ use Symfony\Component\Yaml\Yaml;
 use Tests\Support\ReaderPage;
 
 /*
-| The help centre's facts (spec #30, "Content folder"; user stories 12 to 14): Stockist's name,
+| The help centre's facts (spec #30, "Content folder"; user stories 12 to 14): First Mile Manager's name,
 | description, stage and address, copied word for word from the marketing site's site.ts into
 | content/facts.yaml, so the two sites say the same thing.
 */
 
-it('shows the stage and links About First Mile Manager to the marketing site, from the facts', function () {
+it('links About First Mile Manager to the marketing site, from the facts', function () {
     content()->facts(['stage' => 'Early access', 'url' => 'https://firstmilemanager.co.uk'])->publish();
 
     $page = ReaderPage::of($this->get('/'));
 
-    expect($page->text('.site-head .badge-stage'))->toBe('Early access')
-        ->and($page->links('.site-head a.about'))->toBe([['About First Mile Manager', 'https://firstmilemanager.co.uk']])
-        ->and($page->links('.site-head a.logo-link'))->toBe([['Help centre', '/']]);
+    expect($page->links('.site-head a.about'))->toBe([['About First Mile Manager', 'https://firstmilemanager.co.uk']])
+        ->and($page->links('.site-head a.logo-link'))->toBe([['Help centre', '/']])
+        ->and($page->has('.site-head img[alt="First Mile Manager"]'))->toBeTrue();
 });
 
-it('shows the stage the facts give, whatever it is', function () {
-    content()->facts(['stage' => 'Generally available'])->publish();
+it('says on every page that First Mile Manager is in early access, linking to the early access page', function (string $address) {
+    content()->article('receive-at-the-dock')->glossaryEntry('location')->facts(['stage' => 'Early access', 'url' => 'https://firstmilemanager.co.uk'])->publish();
 
-    expect(ReaderPage::of($this->get('/'))->text('.badge-stage'))->toBe('Generally available');
+    $page = ReaderPage::of($this->get($address));
+
+    expect($page->text('.early-access'))->toBe('First Mile Manager is in early access. Ask for early access')
+        ->and($page->links('.early-access a'))->toBe([['Ask for early access', 'https://firstmilemanager.co.uk/early-access']]);
+})->with(['/', '/articles/receive-at-the-dock', '/glossary/location', '/search?q=dock']);
+
+it('takes the early access banner down once the stage moves on', function () {
+    content()->facts(['stage' => 'Alpha'])->publish();
+
+    expect(ReaderPage::of($this->get('/'))->has('.early-access'))->toBeFalse();
 });
 
-it('says what Stockist is in the footer, in the marketing site\'s words', function () {
-    content()->facts(['description' => 'Stockist WMS is warehouse management software for UK 3PLs.'])->publish();
+it('says what First Mile Manager is in the footer, in the marketing site\'s words', function () {
+    content()->facts(['description' => 'First Mile Manager is software for small couriers.'])->publish();
 
-    expect(ReaderPage::of($this->get('/'))->text('.site-foot'))->toContain('Stockist WMS is warehouse management software for UK 3PLs.');
+    expect(ReaderPage::of($this->get('/'))->text('.site-foot'))->toContain('First Mile Manager is software for small couriers.');
 });
 
 it('refuses a content folder without its facts', function () {

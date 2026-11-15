@@ -1,103 +1,106 @@
 /*
- * Stockist WMS brand tokens (Bay). Light by default; dark with prefers-color-scheme,
- * or force a theme with data-theme="light" / data-theme="dark" on <html>.
- * Fonts are self-hosted from /fonts (SIL Open Font Licence).
+ * The help centre's theme, built on First Mile Manager's brand colours (brand.css, a copy of
+ * brand/tokens.css): Route teal is the one accent, everything else is ink and paper. Light by
+ * default; dark with prefers-color-scheme, or force a theme with data-theme="light" /
+ * data-theme="dark" on <html>. Fonts are self-hosted from /fonts (SIL Open Font Licence).
  */
-@font-face { font-family: "Barlow Condensed"; src: url("/fonts/BarlowCondensed-SemiBold.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: "Barlow Condensed"; src: url("/fonts/BarlowCondensed-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
 @font-face { font-family: "Atkinson Hyperlegible Next"; src: url("/fonts/AtkinsonHyperlegibleNext-Variable.woff2") format("woff2"); font-weight: 200 800; font-style: normal; font-display: swap; }
 @font-face { font-family: "Atkinson Hyperlegible Next"; src: url("/fonts/AtkinsonHyperlegibleNext-Italic-Variable.woff2") format("woff2"); font-weight: 200 800; font-style: italic; font-display: swap; }
 @font-face { font-family: "Atkinson Hyperlegible Mono"; src: url("/fonts/AtkinsonHyperlegibleMono-Variable.woff2") format("woff2"); font-weight: 200 800; font-style: normal; font-display: swap; }
 :root {
-  --sk-page: #FFFFFF;
-  --sk-panel: #F2F3F5;
-  --sk-raised: #FFFFFF;
-  --sk-line: #D9DCE1;
-  --sk-line-strong: #80868F;
-  --sk-ink: #12151C;
-  --sk-ink-muted: #50555F;
-  --sk-floor: #FFC20E;
-  --sk-on-floor: #12151C;
-  --sk-floor-soft: #FFF3C4;
-  --sk-on-floor-soft: #12151C;
-  --sk-link: #12151C;
-  --sk-focus: #12151C;
-  --sk-success: #14743A;
-  --sk-success-soft: #E5F0E9;
-  --sk-warning: #B04A05;
-  --sk-warning-soft: #F6EBE4;
-  --sk-danger: #B8232A;
-  --sk-danger-soft: #F7E7E8;
-  --sk-info: #1F5BB5;
-  --sk-info-soft: #E6EDF7;
-  --sk-shadow-sm: 0 1px 2px #12151c14;
-  --sk-shadow-lg: 0 8px 24px -4px #12151c29;
-  --sk-focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #12151c, 0 0 0 6px #ffc20e;
-  --sk-space-1: 4px;
-  --sk-space-2: 8px;
-  --sk-space-3: 12px;
-  --sk-space-4: 16px;
-  --sk-space-6: 24px;
-  --sk-space-8: 32px;
-  --sk-space-12: 48px;
-  --sk-space-16: 64px;
-  --sk-radius-xs: 3px;
-  --sk-radius-sm: 6px;
-  --sk-radius-md: 10px;
-  --sk-font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
-  --sk-font-text: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --sk-font-code: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  color-scheme: light;
+  --hc-page: var(--fmm-paper);
+  --hc-panel: #F1F5F5;
+  --hc-raised: var(--fmm-paper);
+  --hc-line: #D5DEDF;
+  --hc-line-strong: #7A878A;
+  --hc-ink: var(--fmm-ink);
+  --hc-ink-muted: #4C5A5E;
+  /* The accent fill (buttons, the start of the path, the corners). Labels on it are ink. */
+  --hc-accent: var(--fmm-route-teal);
+  --hc-on-accent: var(--fmm-ink);
+  --hc-accent-soft: #E3F3F1;
+  --hc-on-accent-soft: var(--fmm-ink);
+  --hc-link: var(--fmm-route-teal-text);
+  --hc-focus: var(--fmm-ink);
+  --hc-success: #15803D;
+  --hc-success-soft: #E6F2EA;
+  --hc-warning: #B04A05;
+  --hc-warning-soft: #F6EBE4;
+  --hc-danger: #B8232A;
+  --hc-danger-soft: #F7E7E8;
+  --hc-info: #1F5BB5;
+  --hc-info-soft: #E6EDF7;
+  --hc-shadow-sm: 0 1px 2px #0f1a1e14;
+  --hc-shadow-lg: 0 8px 24px -4px #0f1a1e29;
+  --hc-focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #0f1a1e, 0 0 0 6px #0d9488;
+  --hc-space-1: 4px;
+  --hc-space-2: 8px;
+  --hc-space-3: 12px;
+  --hc-space-4: 16px;
+  --hc-space-6: 24px;
+  --hc-space-8: 32px;
+  --hc-space-12: 48px;
+  --hc-space-16: 64px;
+  --hc-radius-xs: 3px;
+  --hc-radius-sm: 6px;
+  --hc-radius-md: 10px;
+  --hc-font-display: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --hc-font-text: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --hc-font-code: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --sk-page: #0E1015;
-    --sk-panel: #181B22;
-    --sk-raised: #1F232B;
-    --sk-line: #2B3039;
-    --sk-line-strong: #6A707B;
-    --sk-ink: #F2F3F5;
-    --sk-ink-muted: #A3A9B4;
-    --sk-floor-soft: #33290A;
-    --sk-on-floor-soft: #FFD34D;
-    --sk-link: #FFD34D;
-    --sk-focus: #FFC20E;
-    --sk-success: #5BD28A;
-    --sk-success-soft: #1C332A;
-    --sk-warning: #FF9A52;
-    --sk-warning-soft: #392920;
-    --sk-danger: #FF8080;
-    --sk-danger-soft: #392428;
-    --sk-info: #7FAEFF;
-    --sk-info-soft: #222C3F;
-    --sk-shadow-sm: 0 1px 2px #00000099;
-    --sk-shadow-lg: 0 12px 28px -4px #000000cc;
-    --sk-focus-ring: 0 0 0 2px #0e1015, 0 0 0 4px #ffc20e;
+    --hc-page: var(--fmm-night);
+    --hc-panel: #131D21;
+    --hc-raised: #19252A;
+    --hc-line: #26353B;
+    --hc-line-strong: #65767C;
+    --hc-ink: #EEF3F3;
+    --hc-ink-muted: #A2B0B4;
+    --hc-accent-soft: #0E2B29;
+    --hc-on-accent-soft: #EEF3F3;
+    /* Route teal is AA for all text on Night; this lighter teal keeps links AA on the panels too. */
+    --hc-link: #2CB5A8;
+    --hc-focus: var(--fmm-route-teal);
+    --hc-success: #5BD28A;
+    --hc-success-soft: #1C332A;
+    --hc-warning: #FF9A52;
+    --hc-warning-soft: #392920;
+    --hc-danger: #FF8080;
+    --hc-danger-soft: #392428;
+    --hc-info: #7FAEFF;
+    --hc-info-soft: #222C3F;
+    --hc-shadow-sm: 0 1px 2px #00000099;
+    --hc-shadow-lg: 0 12px 28px -4px #000000cc;
+    --hc-focus-ring: 0 0 0 2px #0b1215, 0 0 0 4px #0d9488;
     color-scheme: dark;
   }
 }
+
 :root[data-theme="dark"] {
-  --sk-page: #0E1015;
-  --sk-panel: #181B22;
-  --sk-raised: #1F232B;
-  --sk-line: #2B3039;
-  --sk-line-strong: #6A707B;
-  --sk-ink: #F2F3F5;
-  --sk-ink-muted: #A3A9B4;
-  --sk-floor-soft: #33290A;
-  --sk-on-floor-soft: #FFD34D;
-  --sk-link: #FFD34D;
-  --sk-focus: #FFC20E;
-  --sk-success: #5BD28A;
-  --sk-success-soft: #1C332A;
-  --sk-warning: #FF9A52;
-  --sk-warning-soft: #392920;
-  --sk-danger: #FF8080;
-  --sk-danger-soft: #392428;
-  --sk-info: #7FAEFF;
-  --sk-info-soft: #222C3F;
-  --sk-shadow-sm: 0 1px 2px #00000099;
-  --sk-shadow-lg: 0 12px 28px -4px #000000cc;
-  --sk-focus-ring: 0 0 0 2px #0e1015, 0 0 0 4px #ffc20e;
+  --hc-page: var(--fmm-night);
+  --hc-panel: #131D21;
+  --hc-raised: #19252A;
+  --hc-line: #26353B;
+  --hc-line-strong: #65767C;
+  --hc-ink: #EEF3F3;
+  --hc-ink-muted: #A2B0B4;
+  --hc-accent-soft: #0E2B29;
+  --hc-on-accent-soft: #EEF3F3;
+  /* Route teal is AA for all text on Night; this lighter teal keeps links AA on the panels too. */
+  --hc-link: #2CB5A8;
+  --hc-focus: var(--fmm-route-teal);
+  --hc-success: #5BD28A;
+  --hc-success-soft: #1C332A;
+  --hc-warning: #FF9A52;
+  --hc-warning-soft: #392920;
+  --hc-danger: #FF8080;
+  --hc-danger-soft: #392428;
+  --hc-info: #7FAEFF;
+  --hc-info-soft: #222C3F;
+  --hc-shadow-sm: 0 1px 2px #00000099;
+  --hc-shadow-lg: 0 12px 28px -4px #000000cc;
+  --hc-focus-ring: 0 0 0 2px #0b1215, 0 0 0 4px #0d9488;
   color-scheme: dark;
 }

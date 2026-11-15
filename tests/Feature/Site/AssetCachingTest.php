@@ -40,13 +40,13 @@ it('serves styles for a year', function (string $file) {
         ->assertOk()
         ->assertHeader('Content-Type', 'text/css; charset=UTF-8')
         ->assertHeader('Cache-Control', A_YEAR);
-})->with(['css/tokens.css', 'css/site.css']);
+})->with(['css/brand.css', 'css/tokens.css', 'css/site.css']);
 
 it('serves the fonts the styles use for a year, at fingerprinted addresses', function () {
     $css = $this->get(stylesheet($this, 'css/tokens.css'))->assertOk()->getContent();
     preg_match_all('/url\("?([^")]+)"?\)/', (string) $css, $urls);
 
-    expect($urls[1])->toHaveCount(5);
+    expect($urls[1])->toHaveCount(3);
     foreach ($urls[1] as $font) {
         expect($font)->toMatch('#^/assets/[0-9a-f]{16}/fonts/[A-Za-z-]+\.woff2$#');
         $response = $this->get($font)->assertOk()->assertHeader('Content-Type', 'font/woff2')->assertHeader('Cache-Control', A_YEAR);
