@@ -66,13 +66,13 @@ jobs:
 
     steps:
       # The main project is private, so it is checked out with the read-only key AJ adds as a
-      # repository secret under ticket #32. Without it the tool can't run, and that fails the job.
+      # repository secret under help#2 (docs/putting-it-live.md). Without it the tool can't run, and that fails the job.
       - name: Check for the main project's read-only key
         env:
           STOCKIST_READ_TOKEN: ${{ secrets.STOCKIST_READ_TOKEN }}
         run: |
           if [ -z "$STOCKIST_READ_TOKEN" ]; then
-            echo "::error title=Missing secret STOCKIST_READ_TOKEN (ticket #32)::The picture tool takes Pictures from the main project (gpl-ajackson/stockist), read with the repository secret STOCKIST_READ_TOKEN, a read-only key AJ adds under ticket #32, and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            echo "::error title=Missing secret STOCKIST_READ_TOKEN (help#2)::The picture tool takes Pictures from the main project (gpl-ajackson/stockist), read with the repository secret STOCKIST_READ_TOKEN, a read-only key AJ adds under help#2 (docs/putting-it-live.md), and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
             exit 1
           fi
 
