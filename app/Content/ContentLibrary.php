@@ -802,8 +802,11 @@ final class ContentLibrary
     private function releaseNoteRows(array $notes, array $waiting, array $areas, LinkTargets $targets, Renderer $renderer, array &$brokenLinks, array &$problems): array
     {
         $links = new LinksByName($targets, new LinkingPage(name: '', clientTier: false, draft: false));
-        $render = function (ChangeSummary $change, string $file, callable $lineOfLink, callable $lineOfArticle) use ($links, $targets, $renderer, &$brokenLinks, &$problems): array {
-            $text = $renderer->article($change->text, [], $links);
+        // A Change Summary still waiting is read at the FMM Release that puts its feature on the demo.
+        $waitingLinks = new LinksByName($targets, new LinkingPage(name: '', clientTier: false, draft: false, forNextRelease: true));
+        $render = function (ChangeSummary $change, string $file, callable $lineOfLink, callable $lineOfArticle, ?LinksByName $with = null) use ($links, $targets, $renderer, &$brokenLinks, &$problems): array {
+            $with ??= $links;
+            $text = $renderer->article($change->text, [], $with);
             foreach ($text->problems as $problem) {
                 $problems[] = new ContentProblem($file, 'Section Name', $problem);
             }
@@ -814,7 +817,7 @@ final class ContentLibrary
             }
             $articles = [];
             foreach ($change->articles as $name) {
-                $article = $links->relatedArticle($name, $lineOfArticle($name));
+                $article = $with->relatedArticle($name, $lineOfArticle($name));
                 if ($article->problem !== null || $article->address === null) {
                     $brokenLinks[] = new BrokenLink($file, $article->line, 'articles', $name, (string) $article->problem);
 
@@ -829,7 +832,8 @@ final class ContentLibrary
         foreach ($waiting as $summary) {
             $render($summary->summary, $summary->file,
                 fn (NamedLink $link): int => $summary->bodyLine + $link->line - 1,
-                fn (string $name): int => $summary->lineOfArticle($name));
+                fn (string $name): int => $summary->lineOfArticle($name),
+                $waitingLinks);
         }
 
         $order = array_flip(array_map(fn (ProductAreaSource $area): string => $area->name, $areas));

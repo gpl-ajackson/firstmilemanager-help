@@ -14,5 +14,10 @@ final readonly class LinkingPage
         public bool $draft,
         /** Only a Joint-only page links to a Joint-only Article, so an FMM-only reader never follows one. */
         public bool $jointOnly = false,
+        /**
+         * A Change Summary waiting for the next FMM Release, read once that release has put its
+         * feature on the demo, so it may link an Article still waiting for the demo.
+         */
+        public bool $forNextRelease = false,
     ) {}
 }

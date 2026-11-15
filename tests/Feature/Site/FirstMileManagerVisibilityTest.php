@@ -107,3 +107,12 @@ it('refuses a Joint-only Client-tier Article', function () {
     expect($exitCode)->toBe(1)
         ->and($output)->toContain('joint_only: can\'t be on a Client-tier Article');
 });
+
+it('lets a Change Summary waiting for the next FMM Release link an Article waiting for the demo', function () {
+    $content = aFeaturesHelpCentre(onDemo: false)->file('next-release/fmm-57-sign-in.md', "---\nproduct_area: People\nteam_roles: [Admin]\naffects_clients: false\narticles: [sign-in-to-first-mile-manager]\n---\n\nYou can now sign in to First Mile Manager.\n");
+
+    ['exitCode' => $exitCode, 'output' => $output] = $content->rebuild();
+
+    expect($exitCode)->toBe(0)
+        ->and($output)->not->toContain('next-release/');
+});

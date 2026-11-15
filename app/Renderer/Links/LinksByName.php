@@ -191,7 +191,7 @@ final class LinksByName
         if ($target['status'] === 'Retired') {
             return $problem("\"{$name}\" is Retired; link the Article that replaces it");
         }
-        if ($target['status'] === 'Draft' && ! $this->page->draft) {
+        if ($target['status'] === 'Draft' && ! $this->page->draft && ! ($target['waitingForDemo'] && $this->page->forNextRelease)) {
             return $problem($target['waitingForDemo']
                 ? "\"{$name}\" waits for its feature to reach the demo (content/features.yaml), so readers can't open it yet"
                 : "\"{$name}\" is a Draft, so readers can't open it yet");
