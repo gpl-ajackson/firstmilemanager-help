@@ -1,0 +1,82 @@
+name: Glossary Check (weekly)
+
+# The Glossary Check (Launch Check 4) every week against the main project's main, so the help
+# centre's Glossary keeps up with GLOSSARY.md between changes (spec #30). Its findings are
+# posted to the Content Owner: a comment on the open "Glossary Check" issue, or a new issue
+# assigned to them (help:glossary-check --post-to). It also runs on every pull request as part
+# of help:launch-checks (launch-checks.yml). A run turns red when an entry names a term
+# GLOSSARY.md no longer has, or when the findings can't be posted.
+
+on:
+  schedule:
+    # Mondays at 07:00 UTC (8am in British Summer Time), ahead of the working week.
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  glossary-check:
+    name: Glossary Check
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    permissions:
+      contents: read
+      # To open the Glossary Check issue and comment on it.
+      issues: write
+
+    steps:
+      # The main project is private, so the check reads it with the read-only key AJ adds as a
+      # repository secret under ticket #32. Without it the check can't run, and that fails.
+      - name: Check for the main project's read-only key
+        env:
+          FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
+        run: |
+          if [ -z "$FMM_READ_TOKEN" ]; then
+            echo "::error title=Missing secret FMM_READ_TOKEN (help#2)::The Glossary Check reads the main project (gpl-ajackson/firstmilemanager) with the repository secret FMM_READ_TOKEN, a read-only key AJ adds under ticket #32, and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, pgsql, intl, gd
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Check out the main project at main
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/firstmilemanager
+          ref: main
+          token: ${{ secrets.FMM_READ_TOKEN }}
+          path: .launch-checks/firstmilemanager
+          persist-credentials: false
+
+      - name: Run the Glossary Check and post its findings
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          commit=$(git -C .launch-checks/firstmilemanager rev-parse --short=12 HEAD)
+          php artisan help:glossary-check \
+            --main-project=.launch-checks/firstmilemanager \
+            --main-project-ref="main ($commit)" \
+            --post-to="$REPOSITORY"

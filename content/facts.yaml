@@ -1,0 +1,7 @@
+# The help centre's facts about First Mile Manager, copied word for word from the marketing
+# site's src/data/site.ts (gpl-ajackson/firstmilemanager-marketing), so both sites say the same
+# thing. Change them there first, then here; Launch Check 9 compares the two.
+name: First Mile Manager
+description: First Mile Manager is software for small couriers and hauliers that collect from local businesses. It takes your clients' bookings, plans your collection rounds and bills each client at the right rate.
+stage: Early access
+url: https://firstmilemanager.co.uk

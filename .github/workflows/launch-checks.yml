@@ -1,0 +1,502 @@
+name: Launch Checks
+
+# The automated Launch Checks (spec #30, seam 2) on every support-site pull request and every
+# push to main (there as part of deploy.yml, which deploys only when they and CI pass):
+# help:launch-checks over content/, against the main project at main, or at the
+# paired change when the description links a main-project pull request. Any failure fails the
+# build; reports are posted on the pull request for the reviewer and never fail it.
+#
+# A description edit re-runs it, because the Help only check reads the description.
+#
+# Launch Check 9 reads the pull request's sitemap, llms.txt and noindex pages as they will be once
+# the help centre is public, from the help centre's database (in a transaction it rolls back),
+# and compares its facts with the marketing site's site.ts at main.
+#
+# Launch Check 12 retakes the Pictures the pull request (or push) adds or changes from the main
+# project's checkout, with the picture tool (Stockist installed and seeded at the Picture Date, in
+# Postgres), and fails each one a reader would see differ, or whose Recipe broke. It runs in a
+# job of its own, Picture Check, on PICTURE_RUNNER (the CI server, CI_RUNNER, unless that
+# repository variable names another; pictures/README.md says why). It posts its own comment, and its
+# before, after and difference images are the run's picture-check artefact. With no Picture
+# changed, the job stops after checkout: nothing is taken and Stockist isn't installed.
+#
+# Launch Checks 7, 8 and 11 (--pages) open every published page of the pull request's content in
+# headless Chromium, served by the help centre itself from that content: an axe WCAG 2.2 AA scan
+# and no sideways scrolling at 320px, 390px and 1280px; no cookie or device storage, and a test
+# reader's Search, vote and "Still stuck?" leaving nothing about them in any record; each page
+# template usable within 3 seconds on slow 4G.
+#
+# Rules that hold only from launch on (a built feature's plan or spec still listing a new:
+# Article) are reported here until going public is on, and fail from then on. The run for the
+# Launch Check issue, before going public, adds --at-launch.
+#
+# That run is this workflow started by hand (Actions › Launch Checks › Run workflow, on main):
+# every check over main's content with --at-launch; Launch Check 11 also times each page template
+# at the real address (--speed-at), through Cloudflare Access with the service token saved as
+# CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET (ticket #33); the real address's llms.txt,
+# sitemap, redirects and page not found are checked through the same token; and the Picture
+# Check retakes every Picture, not just the changed ones. Its findings are the run's summary,
+# which the Launch Check issue links as evidence (#80).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Named here rather than from github.workflow, which is the caller's name when deploy.yml calls this.
+concurrency:
+  group: launch-checks-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  launch-checks:
+    name: Launch Checks
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    permissions:
+      contents: read
+      # To post and update the findings comment. A fork's pull request gets a read-only token,
+      # so its comment step fails quietly; the checks themselves still decide the build.
+      pull-requests: write
+
+    # Launch Check 10 (Findability) loads the pull request's content into the help centre's own
+    # database (in a transaction it rolls back) and searches it in a fresh Meilisearch index.
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: sail
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sail -d testing"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      meilisearch:
+        image: getmeili/meilisearch:v1.52.4
+        env:
+          MEILI_MASTER_KEY: ci-only-meilisearch-master-key
+          MEILI_NO_ANALYTICS: 'true'
+        ports:
+          - 7700:7700
+
+    # The job runs on the runner, so the services are on localhost. The key belongs to this
+    # job's own throwaway instance; it is not a secret.
+    env:
+      DB_HOST: 127.0.0.1
+      DB_DATABASE: testing
+      MEILISEARCH_HOST: http://127.0.0.1:7700
+      MEILISEARCH_KEY: ci-only-meilisearch-master-key
+      # The run for the Launch Check issue (started by hand) checks the real address too.
+      LAUNCH_RUN: ${{ github.event_name == 'workflow_dispatch' }}
+      REAL_ADDRESS: https://help.firstmilemanager.co.uk
+
+    steps:
+      - name: Name the files the steps share
+        run: |
+          echo "FINDINGS=$RUNNER_TEMP/launch-checks.md" >> "$GITHUB_ENV"
+          echo "DESCRIPTION_FILE=$RUNNER_TEMP/pull-request-description.md" >> "$GITHUB_ENV"
+
+      # The main project is private, so the checks read it with the read-only key AJ adds as a
+      # repository secret under ticket #32. Without it they can't run, and that fails the build.
+      - name: Check for the Access service token (the run for the Launch Check issue)
+        if: env.LAUNCH_RUN == 'true'
+        env:
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          if [ -z "$CF_ACCESS_CLIENT_ID" ] || [ -z "$CF_ACCESS_CLIENT_SECRET" ]; then
+            message="The run for the Launch Check issue reaches the real address through Cloudflare Access with the service token help-centre-ci, saved as the repository secrets CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET (ticket #33), and one is missing. Add it under Settings › Secrets and variables › Actions, then re-run this workflow."
+            echo "::error title=Missing Access service token (ticket #33)::${message}"
+            printf '<!-- help-launch-checks -->\n## Launch Checks\n\n**Could not run:** %s\n' "$message" > "$FINDINGS"
+            exit 1
+          fi
+
+      - name: Check for the main project's read-only key
+        env:
+          FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
+        run: |
+          if [ -z "$FMM_READ_TOKEN" ]; then
+            message="The Launch Checks read the main project (gpl-ajackson/firstmilemanager) with the repository secret FMM_READ_TOKEN, a read-only key AJ adds under ticket #32, and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            echo "::error title=Missing secret FMM_READ_TOKEN (help#2)::${message}"
+            printf '<!-- help-launch-checks -->\n## Launch Checks\n\n**Could not run:** %s\n' "$message" > "$FINDINGS"
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, pgsql, intl, gd
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          cp .env.example .env
+          php artisan key:generate
+
+      # The Findability check rebuilds the content into the help centre's tables to search it.
+      - name: Make the help centre's database
+        run: php artisan migrate --force
+
+      # Check 1 reads every Article as the rebuild does, drawing its Mermaid diagrams with the
+      # pinned tool in tools/diagrams (Mermaid in Chromium through Playwright). The page checks
+      # (7, 8 and 11) use the same Playwright and Chromium, and the axe-core pinned beside them.
+      - name: Install the diagram tool and its Chromium
+        run: |
+          npm ci --prefix tools/diagrams --no-audit --no-fund
+          npx --prefix tools/diagrams playwright install --with-deps chromium
+          # The page checks find the same pinned Playwright through NODE_PATH.
+          echo "NODE_PATH=$GITHUB_WORKSPACE/tools/diagrams/node_modules" >> "$GITHUB_ENV"
+
+      - name: Save the pull request's description
+        if: github.event_name == 'pull_request'
+        env:
+          DESCRIPTION: ${{ github.event.pull_request.body }}
+        run: printf '%s' "$DESCRIPTION" > "$DESCRIPTION_FILE"
+
+      - name: Find the main project's ref (the paired change, or main)
+        id: main-project
+        run: |
+          if [ -f "$DESCRIPTION_FILE" ]; then
+            echo "ref=$(php artisan help:paired-change --pull-request-description="$DESCRIPTION_FILE")" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out the main project at that ref
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/firstmilemanager
+          ref: ${{ steps.main-project.outputs.ref }}
+          token: ${{ secrets.FMM_READ_TOKEN }}
+          path: .launch-checks/firstmilemanager
+          persist-credentials: false
+
+      # Launch Check 9 compares the help centre's facts (content/facts.yaml) with the marketing
+      # site's src/data/site.ts at main, read with the same read-only key.
+      - name: Check out the marketing site at main
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/firstmilemanager-marketing
+          ref: main
+          token: ${{ secrets.FMM_READ_TOKEN }}
+          path: .launch-checks/marketing-site
+          persist-credentials: false
+
+      - name: Run the Launch Checks
+        env:
+          MAIN_PROJECT_REF: ${{ steps.main-project.outputs.ref }}
+          # Read-only lookups of the Article Owners' GitHub accounts; the token raises the rate limit.
+          GITHUB_TOKEN: ${{ github.token }}
+          # Source References cite the main project's issues (fmm#n, specs); they live on
+          # GitHub, so check 2 reads them with the same read-only key, which needs Issues: read.
+          FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
+          # Only the run for the Launch Check issue is given the Access service token.
+          CF_ACCESS_CLIENT_ID: ${{ env.LAUNCH_RUN == 'true' && secrets.CF_ACCESS_CLIENT_ID || '' }}
+          CF_ACCESS_CLIENT_SECRET: ${{ env.LAUNCH_RUN == 'true' && secrets.CF_ACCESS_CLIENT_SECRET || '' }}
+        run: |
+          description=()
+          if [ -f "$DESCRIPTION_FILE" ]; then
+            description=(--pull-request-description="$DESCRIPTION_FILE")
+          fi
+          launch=()
+          if [ "$LAUNCH_RUN" = "true" ]; then
+            launch=(--at-launch --speed-at="$REAL_ADDRESS")
+          fi
+          php artisan help:launch-checks \
+            --main-project=.launch-checks/firstmilemanager \
+            --main-project-ref="$MAIN_PROJECT_REF" \
+            --marketing-site=.launch-checks/marketing-site \
+            "${description[@]}" \
+            "${launch[@]}" \
+            --check-owner-logins \
+            --pages \
+            --markdown="$FINDINGS"
+
+      # The help centre's own answers at the real address, which only the server and Cloudflare
+      # in front of it give: llms.txt and the sitemap served, an http address and the privacy
+      # notice redirected, and an unknown address the help centre's page not found (not Access's
+      # sign-in). Each line goes in the findings; any wrong answer fails the run.
+      - name: Check llms.txt, the sitemap and redirects at the real address
+        if: ${{ !cancelled() && env.LAUNCH_RUN == 'true' }}
+        env:
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          host="${REAL_ADDRESS#https://}"
+          failed=0
+          lines=()
+          # Prints the status code, the Location header and the content type of one request.
+          answer() {
+            curl -sS -o "$RUNNER_TEMP/body" --max-time 30 \
+              -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+              -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
+              -w '%{http_code} %{redirect_url} %{content_type}' "$1" || echo "000 - -"
+          }
+          check() {
+            local name="$1" url="$2" want="$3" got
+            got=$(answer "$url")
+            if [[ "$got" =~ $want ]] && { [ -z "$4" ] || grep -q -- "$4" "$RUNNER_TEMP/body"; }; then
+              lines+=("- Passed: $name (\`$url\` answered \`$got\`)")
+            else
+              lines+=("- **Failed:** $name (\`$url\` answered \`$got\`)")
+              failed=1
+            fi
+          }
+          check "llms.txt is served, naming the help centre's address" "$REAL_ADDRESS/llms.txt" '^200 .* text/plain' "$host"
+          check "the sitemap is served" "$REAL_ADDRESS/sitemap.xml" '^200 .*xml' '<urlset'
+          check "an http address redirects to https" "http://$host/" "^30[178] https://$host/ "
+          check "the privacy notice redirects to the marketing site's" "$REAL_ADDRESS/privacy" '^30[278] https://firstmilemanager\.co\.uk/privacy'
+          check "an unknown address is the help centre's page not found" "$REAL_ADDRESS/articles/no-such-article-launch-run" '^404 .*text/html' 'Help centre'
+          {
+            printf '\n### At the real address (%s)\n\n' "$REAL_ADDRESS"
+            printf '%s\n' "${lines[@]}"
+          } | tee -a "$FINDINGS"
+          exit "$failed"
+
+      # On main there is no pull request to comment on, so the findings go to the run's summary.
+      - name: Show the findings in the run's summary
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          if [ -s "$FINDINGS" ]; then
+            cat "$FINDINGS" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # One comment per pull request, updated in place on each run. Posting it never fails the
+      # build: only the checks above do.
+      - name: Post the findings on the pull request
+        if: always() && github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PULL_REQUEST: ${{ github.event.pull_request.number }}
+        run: |
+          if [ ! -s "$FINDINGS" ]; then
+            printf '<!-- help-launch-checks -->\n## Launch Checks\n\n**Could not run:** see the job log.\n' > "$FINDINGS"
+          fi
+          comment=$(gh api "repos/$REPOSITORY/issues/$PULL_REQUEST/comments" --paginate \
+            --jq '.[] | select(.body | startswith("<!-- help-launch-checks -->")) | .id' | head -n 1)
+          if [ -n "$comment" ]; then
+            gh api --method PATCH "repos/$REPOSITORY/issues/comments/$comment" -F body=@"$FINDINGS" > /dev/null
+          else
+            gh api --method POST "repos/$REPOSITORY/issues/$PULL_REQUEST/comments" -F body=@"$FINDINGS" > /dev/null
+          fi
+
+  picture-check:
+    name: Picture Check
+    # See the top of this file: Pictures are checked on the kind of machine they are taken on.
+    runs-on: ${{ vars.PICTURE_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    # The picture tool seeds Stockist's Trentside demo in Postgres to retake Pictures.
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: sail
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sail -d testing"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_DATABASE: testing
+      # The Pictures changed since the pull request's base (or, on main, since the commit
+      # before the push).
+      PICTURES_BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
+      # The run for the Launch Check issue (started by hand) retakes every Picture.
+      LAUNCH_RUN: ${{ github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - name: Name the files the steps share
+        run: |
+          echo "FINDINGS=$RUNNER_TEMP/picture-check.md" >> "$GITHUB_ENV"
+          echo "DESCRIPTION_FILE=$RUNNER_TEMP/pull-request-description.md" >> "$GITHUB_ENV"
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          # The whole history, to tell which Pictures changed since the base.
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The same rule as Launch Check 12 (App\LaunchChecks\Pictures\ChangedPictures): a Picture
+      # whose .png or .yaml changed since the merge base. The Launch Checks job checks every
+      # Recipe and every Picture an Article shows; this job only retakes.
+      - name: Find the Pictures this change adds or changes
+        id: changed
+        run: |
+          if [ "$LAUNCH_RUN" = "true" ]; then
+            echo "The run for the Launch Check issue retakes every Picture."
+            echo "any=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          from=$(git merge-base "$PICTURES_BASE" HEAD)
+          changed=$(git diff --name-only --no-renames "$from" HEAD -- pictures/ | grep -E '^pictures/[^/]+\.(png|yaml)$' || true)
+          if [ -n "$changed" ]; then
+            echo "$changed"
+            echo "any=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No Picture changed since $PICTURES_BASE, so none is retaken."
+            echo "any=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for the main project's read-only key
+        if: steps.changed.outputs.any == 'true'
+        env:
+          FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
+        run: |
+          if [ -z "$FMM_READ_TOKEN" ]; then
+            message="The Picture Check retakes Pictures from the main project (gpl-ajackson/firstmilemanager), read with the repository secret FMM_READ_TOKEN (help#2), and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            echo "::error title=Missing secret FMM_READ_TOKEN (help#2)::${message}"
+            printf '<!-- help-launch-checks-pictures -->\n## Picture Check (Launch Check 12)\n\n**Could not run:** %s\n' "$message" > "$FINDINGS"
+            exit 1
+          fi
+
+      - name: Setup PHP
+        if: steps.changed.outputs.any == 'true'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          # The help centre's, and Stockist's own (bcmath, pcntl, posix) for the copy the picture
+          # tool runs.
+          extensions: pdo_pgsql, pgsql, intl, gd, bcmath, pcntl, posix
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        if: steps.changed.outputs.any == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install Composer dependencies
+        if: steps.changed.outputs.any == 'true'
+        run: |
+          composer install --no-interaction --no-progress
+          cp .env.example .env
+          php artisan key:generate
+
+      # The picture tool's camera, and the diagrams the content is read with, use the Playwright
+      # and Chromium pinned in tools/diagrams.
+      - name: Install the picture tool's Chromium
+        if: steps.changed.outputs.any == 'true'
+        run: |
+          npm ci --prefix tools/diagrams --no-audit --no-fund
+          npx --prefix tools/diagrams playwright install --with-deps chromium
+          echo "NODE_PATH=$GITHUB_WORKSPACE/tools/diagrams/node_modules" >> "$GITHUB_ENV"
+
+      - name: Save the pull request's description
+        if: steps.changed.outputs.any == 'true' && github.event_name == 'pull_request'
+        env:
+          DESCRIPTION: ${{ github.event.pull_request.body }}
+        run: printf '%s' "$DESCRIPTION" > "$DESCRIPTION_FILE"
+
+      - name: Find the main project's ref (the paired change, or main)
+        if: steps.changed.outputs.any == 'true'
+        id: main-project
+        run: |
+          if [ -f "$DESCRIPTION_FILE" ]; then
+            echo "ref=$(php artisan help:paired-change --pull-request-description="$DESCRIPTION_FILE")" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out the main project at that ref
+        if: steps.changed.outputs.any == 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/firstmilemanager
+          ref: ${{ steps.main-project.outputs.ref }}
+          token: ${{ secrets.FMM_READ_TOKEN }}
+          path: .launch-checks/firstmilemanager
+          persist-credentials: false
+
+      - name: Retake the changed Pictures
+        if: steps.changed.outputs.any == 'true'
+        env:
+          MAIN_PROJECT_REF: ${{ steps.main-project.outputs.ref }}
+        run: |
+          which=(--take-pictures=changed --pictures-base="$PICTURES_BASE")
+          if [ "$LAUNCH_RUN" = "true" ]; then
+            which=(--take-pictures=all --at-launch)
+          fi
+          php artisan help:launch-checks \
+            --pictures-only \
+            --main-project=.launch-checks/firstmilemanager \
+            --main-project-ref="$MAIN_PROJECT_REF" \
+            "${which[@]}" \
+            --picture-artefacts="$GITHUB_WORKSPACE/picture-check" \
+            --markdown="$FINDINGS"
+
+      - name: Keep the Picture Check's before, after and difference images
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: picture-check
+          path: picture-check/
+          if-no-files-found: ignore
+
+      - name: Show the findings in the run's summary
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          if [ -s "$FINDINGS" ]; then
+            cat "$FINDINGS" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Its own comment, updated in place, beside the Launch Checks'. With no Picture changed
+      # there is nothing to say, so an earlier run's comment is updated to say so, and no new
+      # one is posted.
+      - name: Post the findings on the pull request
+        if: always() && github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PULL_REQUEST: ${{ github.event.pull_request.number }}
+          ANY_CHANGED: ${{ steps.changed.outputs.any }}
+        run: |
+          if [ ! -s "$FINDINGS" ]; then
+            if [ "$ANY_CHANGED" = "false" ]; then
+              printf '<!-- help-launch-checks-pictures -->\n## Picture Check (Launch Check 12)\n\n**Passed.** No Picture changed, so none was retaken.\n' > "$FINDINGS"
+            else
+              printf '<!-- help-launch-checks-pictures -->\n## Picture Check (Launch Check 12)\n\n**Could not run:** see the job log.\n' > "$FINDINGS"
+            fi
+          fi
+          comment=$(gh api "repos/$REPOSITORY/issues/$PULL_REQUEST/comments" --paginate \
+            --jq '.[] | select(.body | startswith("<!-- help-launch-checks-pictures -->")) | .id' | head -n 1)
+          if [ -n "$comment" ]; then
+            gh api --method PATCH "repos/$REPOSITORY/issues/comments/$comment" -F body=@"$FINDINGS" > /dev/null
+          elif [ "$ANY_CHANGED" != "false" ]; then
+            gh api --method POST "repos/$REPOSITORY/issues/$PULL_REQUEST/comments" -F body=@"$FINDINGS" > /dev/null
+          fi

@@ -1,0 +1,14 @@
+{
+  "name": "stockist-help-diagrams",
+  "private": true,
+  "description": "The help centre's pinned Node tools: draws the Mermaid diagrams in Articles as images during help:rebuild (render.cjs), and gives the Launch Checks' page checks Playwright and axe-core. Not part of any page.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "axe-core": "4.14.0",
+    "mermaid": "12.1.0",
+    "playwright": "1.64.1"
+  }
+}

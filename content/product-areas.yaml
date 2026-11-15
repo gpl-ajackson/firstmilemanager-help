@@ -1,0 +1,12 @@
+# The Product Areas: First Mile Manager's main menus, name for name, each with the main project's
+# translation key for its menu label (Launch Check 1 fails a name that no longer matches the menu).
+# A key with no dot is a plain-text key, as the app's `__('People')` uses. The help home and its
+# listings show them in this order; an area shows only once it has a Published Article.
+# A renamed area keeps its old names as former_names: [Old Name], so its old address redirects.
+#
+# Settings is the Operator's own settings page (your business, and its Connection), in the
+# team menu.
+- name: People
+  menu: People
+- name: Settings
+  menu: Settings

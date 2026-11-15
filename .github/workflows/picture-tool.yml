@@ -1,0 +1,133 @@
+name: Picture tool
+
+# The picture tool's own tests (spec #30 seam 3, ADR-0005): fixture Picture Recipes taken from a
+# real Stockist, installed and seeded at the Picture Date, giving the same image twice, and a
+# broken Recipe reported at its step. They take a few minutes, so they run apart from ci.yml,
+# only when the tool or its tests change. (The Picture Check on every pull request is #64's.)
+# Like every job that takes Pictures, it runs on PICTURE_RUNNER (the CI server, CI_RUNNER, unless
+# that repository variable names another; pictures/README.md says why).
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/Pictures/**'
+      - 'app/LaunchChecks/Pictures/**'
+      - 'tests/Pictures/**'
+      - 'tests/Support/FixtureRecipes.php'
+      - 'config/help.php'
+      - 'composer.lock'
+      - '.github/workflows/picture-tool.yml'
+  pull_request:
+    paths:
+      - 'app/Pictures/**'
+      - 'app/LaunchChecks/Pictures/**'
+      - 'tests/Pictures/**'
+      - 'tests/Support/FixtureRecipes.php'
+      - 'config/help.php'
+      - 'composer.lock'
+      - '.github/workflows/picture-tool.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  picture-tool:
+    name: Picture tool (Stockist at the Picture Date)
+    runs-on: ${{ vars.PICTURE_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: sail
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sail -d testing"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # The Stockist to take Pictures from: the checkout below, at main (which can hold its clock
+      # at a moment since stockist#277, CLOCK_HELD_AT).
+      STOCKIST_REF: main
+      PICTURES_STOCKIST_REPOSITORY: ${{ github.workspace }}/.pictures/stockist
+      PICTURES_STOCKIST_REF: HEAD
+
+    steps:
+      # The main project is private, so it is checked out with the read-only key AJ adds as a
+      # repository secret under ticket #32. Without it the tool can't run, and that fails the job.
+      - name: Check for the main project's read-only key
+        env:
+          STOCKIST_READ_TOKEN: ${{ secrets.STOCKIST_READ_TOKEN }}
+        run: |
+          if [ -z "$STOCKIST_READ_TOKEN" ]; then
+            echo "::error title=Missing secret STOCKIST_READ_TOKEN (ticket #32)::The picture tool takes Pictures from the main project (gpl-ajackson/stockist), read with the repository secret STOCKIST_READ_TOKEN, a read-only key AJ adds under ticket #32, and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Checkout Stockist
+        uses: actions/checkout@v7
+        with:
+          repository: gpl-ajackson/stockist
+          ref: ${{ env.STOCKIST_REF }}
+          token: ${{ secrets.STOCKIST_READ_TOKEN }}
+          path: .pictures/stockist
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          # The help centre's (gd sizes Pictures), and Stockist's own (bcmath, pcntl, posix) for the
+          # copy it runs.
+          extensions: pdo_pgsql, pgsql, intl, gd, bcmath, pcntl, posix
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          cp .env.example .env
+          php artisan key:generate
+
+      # Pictures are taken in headless Chromium through Playwright, installed globally as for the
+      # layout tests, so the site keeps no package.json.
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --global playwright@1.64.1
+          playwright install --with-deps chromium
+          echo "NODE_PATH=$(npm root --global)" >> "$GITHUB_ENV"
+
+      - name: Run the picture tool's tests
+        run: php artisan test --testsuite=Pictures
+        env:
+          DB_HOST: 127.0.0.1
+
+      - name: Keep the Pictures of any broken screens
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: broken-screens
+          path: storage/pictures/broken/
+          if-no-files-found: ignore

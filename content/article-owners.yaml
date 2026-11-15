@@ -1,0 +1,3 @@
+# Article Owners: the GitHub login of each First Mile Manager person who may own an Article
+# (header data "owner"). Never an agent. Launch Check 1 fails an Article whose owner isn't listed here.
+- gpl-ajackson
