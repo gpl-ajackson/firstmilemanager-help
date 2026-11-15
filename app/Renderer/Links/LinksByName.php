@@ -192,7 +192,12 @@ final class LinksByName
             return $problem("\"{$name}\" is Retired; link the Article that replaces it");
         }
         if ($target['status'] === 'Draft' && ! $this->page->draft) {
-            return $problem("\"{$name}\" is a Draft, so readers can't open it yet");
+            return $problem($target['waitingForDemo']
+                ? "\"{$name}\" waits for its feature to reach the demo (content/features.yaml), so readers can't open it yet"
+                : "\"{$name}\" is a Draft, so readers can't open it yet");
+        }
+        if ($target['jointOnly'] && ! $this->page->jointOnly) {
+            return $problem("\"{$name}\" is Joint-only, so only a Joint-only Article links to it: a reader at an FMM-only Operator never meets Stockist");
         }
         if ($this->page->clientTier && ! $target['clientTier']) {
             return $problem("\"{$name}\" is for Staff; ".self::OUT_OF_TIER.'Articles');

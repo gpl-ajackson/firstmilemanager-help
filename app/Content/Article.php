@@ -31,6 +31,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property array<string, string> $section_names Each Section Name with its heading's words.
  * @property string|null $what_changed What a Retired Article with no replacement tells readers.
  * @property list<string> $terms The terms (by their names in their addresses) its body links to.
+ * @property string|null $feature The feature it is about (content/features.yaml).
+ * @property bool $joint_only About Stockist, for Joint Operators: opened by address, never listed or searched.
+ * @property bool $waiting_for_demo Published, but stored as a Draft till its feature is on the demo.
  */
 class Article extends Model
 {
@@ -52,6 +55,8 @@ class Article extends Model
             'messages' => 'array',
             'section_names' => 'array',
             'terms' => 'array',
+            'joint_only' => 'boolean',
+            'waiting_for_demo' => 'boolean',
         ];
     }
 
@@ -67,5 +72,16 @@ class Article extends Model
     protected function scopePublished(Builder $query): void
     {
         $query->where('status', ArticleStatus::Published);
+    }
+
+    /**
+     * Published and not Joint-only: what listings, search and the sitemap show, so a reader at an
+     * FMM-only Operator never meets an Article about Stockist (ADR-0006).
+     *
+     * @param  Builder<self>  $query
+     */
+    protected function scopeListed(Builder $query): void
+    {
+        $query->where('status', ArticleStatus::Published)->where('joint_only', false);
     }
 }

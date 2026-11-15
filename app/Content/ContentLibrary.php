@@ -49,13 +49,14 @@ final class ContentLibrary
     /**
      * Rebuilds the database copy from the content folder at $contentPath, rendering each
      * Article once with its Pictures from $picturesPath (default: config help.pictures_path)
-     * and its diagrams drawn. Nothing changes unless every file is valid.
+     * and its diagrams drawn. Nothing changes unless every file is valid. $everyFeatureOnDemo
+     * shows the Articles still waiting for the demo, as the Findability check searches them.
      *
      * @throws InvalidContent naming each file and field that is wrong.
      */
-    public function rebuild(string $contentPath, ?string $picturesPath = null): RebuildSummary
+    public function rebuild(string $contentPath, ?string $picturesPath = null, bool $everyFeatureOnDemo = false): RebuildSummary
     {
-        [$articles, $bodies, $entries, $entryBodies, $brokenLinks, $terms, , $facts, $areas, $notes, $noteRows, $waiting] = $this->readArticles(rtrim($contentPath, '/'), $this->rendererFor($picturesPath));
+        [$articles, $bodies, $entries, $entryBodies, $brokenLinks, $terms, , $facts, $areas, $notes, $noteRows, $waiting] = $this->readArticles(rtrim($contentPath, '/'), $this->rendererFor($picturesPath), $everyFeatureOnDemo);
         $redirects = $this->checkAddresses($articles, $entries, $areas, $notes);
 
         $rows = array_map(fn (ArticleSource $article): array => [
@@ -79,6 +80,9 @@ final class ContentLibrary
             'section_names' => json_encode((object) $bodies[$article->name]->sections),
             'what_changed' => $article->whatChanged,
             'terms' => json_encode($terms[$article->name]),
+            'feature' => $article->feature,
+            'joint_only' => $article->jointOnly,
+            'waiting_for_demo' => $article->waitingForDemo,
         ], $articles);
         $entryRows = $this->entryRows($entries, $entryBodies);
 
@@ -109,13 +113,14 @@ final class ContentLibrary
 
         return new RebuildSummary(
             published: $count(ArticleStatus::Published),
-            drafts: $count(ArticleStatus::Draft),
+            drafts: count(array_filter($articles, fn (ArticleSource $a): bool => $a->status === ArticleStatus::Draft && ! $a->waitingForDemo)),
             retired: $count(ArticleStatus::Retired),
             brokenLinks: $brokenLinks,
             glossaryEntries: count(array_filter($entries, fn (GlossaryEntrySource $e): bool => $e->audienceTier === AudienceTier::Staff)),
             clientGlossaryEntries: count(array_filter($entries, fn (GlossaryEntrySource $e): bool => $e->audienceTier === AudienceTier::Client)),
             releaseNotes: count($notes),
             changeSummaries: $waiting,
+            waitingForDemo: count(array_filter($articles, fn (ArticleSource $a): bool => $a->waitingForDemo)),
         );
     }
 
@@ -200,14 +205,15 @@ final class ContentLibrary
     }
 
     /**
-     * Every Published Article, by title. Listings, the sitemap, llms.txt and the search index
-     * take Articles from here, so a Draft or Retired Article is never listed or searched.
+     * Every Published Article but the Joint-only ones, by title. Listings, the sitemap, llms.txt
+     * and the search index take Articles from here, so a Draft, Retired or Joint-only Article is
+     * never listed or searched.
      *
      * @return Collection<int, Article>
      */
     public function publishedArticles(): Collection
     {
-        return Article::query()->published()->orderBy('title')->get();
+        return Article::query()->listed()->orderBy('title')->get();
     }
 
     /**
@@ -230,7 +236,7 @@ final class ContentLibrary
     public function productAreaCounts(): array
     {
         $counts = [];
-        foreach (Article::query()->published()->get(['product_area']) as $article) {
+        foreach (Article::query()->listed()->get(['product_area']) as $article) {
             $counts[$article->product_area] = ($counts[$article->product_area] ?? 0) + 1;
         }
 
@@ -260,7 +266,7 @@ final class ContentLibrary
      */
     public function articlesInArea(string $productArea): Collection
     {
-        return $this->inListingOrder(Article::query()->published()->where('product_area', $productArea)->get());
+        return $this->inListingOrder(Article::query()->listed()->where('product_area', $productArea)->get());
     }
 
     /**
@@ -271,7 +277,7 @@ final class ContentLibrary
      */
     public function rolePath(RolePath $role): array
     {
-        $articles = Article::query()->published()
+        $articles = Article::query()->listed()
             ->where('audience_tier', AudienceTier::Staff)
             ->where(function (Builder $query) use ($role): void {
                 foreach ($role->teamRoles() as $teamRole) {
@@ -291,7 +297,7 @@ final class ContentLibrary
      */
     public function gettingStartedPath(): Collection
     {
-        return Article::query()->published()->where('type', ArticleType::GettingStarted)->orderBy('path_position')->get();
+        return Article::query()->listed()->where('type', ArticleType::GettingStarted)->orderBy('path_position')->get();
     }
 
     /**
@@ -302,7 +308,7 @@ final class ContentLibrary
      */
     public function clientArticles(): Collection
     {
-        return $this->inListingOrder(Article::query()->published()->where('audience_tier', AudienceTier::Client)->get(), byArea: true);
+        return $this->inListingOrder(Article::query()->listed()->where('audience_tier', AudienceTier::Client)->get(), byArea: true);
     }
 
     /**
@@ -312,7 +318,7 @@ final class ContentLibrary
      */
     public function troubleshootingArticles(): array
     {
-        return $this->byProductArea(Article::query()->published()->where('type', ArticleType::Troubleshooting)->get());
+        return $this->byProductArea(Article::query()->listed()->where('type', ArticleType::Troubleshooting)->get());
     }
 
     /**
@@ -397,7 +403,7 @@ final class ContentLibrary
     /** Whether a Product Area has a Published Article, and so appears on the site. */
     public function productAreaIsShown(string $productArea): bool
     {
-        return Article::query()->published()->where('product_area', $productArea)->exists();
+        return Article::query()->listed()->where('product_area', $productArea)->exists();
     }
 
     /**
@@ -496,7 +502,7 @@ final class ContentLibrary
      */
     public function articlesUsing(GlossaryEntry $entry): Collection
     {
-        return Article::query()->published()
+        return Article::query()->listed()
             ->where('audience_tier', $entry->audience_tier)
             ->whereJsonContains('terms', $entry->name)
             ->orderBy('title')
@@ -514,6 +520,7 @@ final class ContentLibrary
         $names = array_values(array_diff($article->related_articles, [$article->name]));
 
         return Article::query()->published()->whereIn('name', $names)
+            ->unless($article->joint_only, fn (Builder $query) => $query->where('joint_only', false))
             ->when($article->audience_tier === AudienceTier::Client,
                 fn (Builder $query) => $query->where('audience_tier', AudienceTier::Client))
             ->get()
@@ -633,7 +640,7 @@ final class ContentLibrary
      *
      * @throws InvalidContent
      */
-    private function readArticles(string $contentPath, Renderer $renderer): array
+    private function readArticles(string $contentPath, Renderer $renderer, bool $everyFeatureOnDemo = false): array
     {
         $problems = [];
         if (! is_dir($contentPath.'/articles')) {
@@ -665,6 +672,19 @@ final class ContentLibrary
             $parsed[$article->name] = $body;
         }
 
+        // An Article goes public only once its feature is on the demo (ADR-0006); till then it waits as a Draft.
+        $features = FeatureList::read($contentPath, $problems);
+        foreach ($articles as $index => $article) {
+            if ($article->feature === null) {
+                continue;
+            }
+            if (! $features->has($article->feature)) {
+                $problems[] = new ContentProblem($article->file, 'feature', "\"{$article->feature}\" is not a feature in ".FeatureList::FILE.': name one it lists, or add it there with its spec and on_demo');
+            } elseif ($article->status === ArticleStatus::Published && ! $everyFeatureOnDemo && ! $features->isOnDemo($article->feature)) {
+                $articles[$index] = $article->waitingForDemo();
+            }
+        }
+
         array_push($problems, ...$this->pathProblems($articles));
         $entries = $this->readEntries($contentPath, $problems);
         $facts = FactsSource::read($contentPath, $problems);
@@ -686,6 +706,7 @@ final class ContentLibrary
                 name: $article->name,
                 clientTier: $article->audienceTier === AudienceTier::Client,
                 draft: $article->status === ArticleStatus::Draft,
+                jointOnly: $article->jointOnly,
             ));
             $bodies[$article->name] = $renderer->render($parsed[$article->name], $links);
             $terms[$article->name] = array_values(array_unique(array_map(fn (NamedLink $link): string => (string) $link->name,
@@ -711,7 +732,7 @@ final class ContentLibrary
         // An entry's body links for its own tier's readers: a Client Glossary entry only to client pages.
         $entryBodies = [];
         foreach ($entries as $entry) {
-            $links = new LinksByName($targets, new LinkingPage(name: '', clientTier: $entry->audienceTier === AudienceTier::Client, draft: false));
+            $links = new LinksByName($targets, new LinkingPage(name: '', clientTier: $entry->audienceTier === AudienceTier::Client, draft: false, jointOnly: false));
             $body = $renderer->article($entry->body, [], $links);
             foreach ($body->problems as $problem) {
                 $problems[] = new ContentProblem($entry->file, 'Section Name', $problem);
@@ -911,7 +932,7 @@ final class ContentLibrary
         }
         foreach ($articles as $article) {
             if ($article->status !== ArticleStatus::Retired) {
-                $targets->page(ProductAreaSource::addressOf($article->productArea), published: $article->status === ArticleStatus::Published);
+                $targets->page(ProductAreaSource::addressOf($article->productArea), published: $article->status === ArticleStatus::Published && ! $article->jointOnly);
             }
         }
         foreach ($articles as $article) {
@@ -921,7 +942,9 @@ final class ContentLibrary
                     ArticleStatus::Published => 'Published',
                     ArticleStatus::Draft => 'Draft',
                     ArticleStatus::Retired => 'Retired',
-                });
+                },
+                jointOnly: $article->jointOnly,
+                waitingForDemo: $article->waitingForDemo);
         }
         foreach ($entries as $entry) {
             $targets->term($entry->name, $entry->address(), $entry->audienceTier === AudienceTier::Client, words: $entry->term);

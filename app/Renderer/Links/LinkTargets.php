@@ -14,7 +14,7 @@ namespace App\Renderer\Links;
  */
 final class LinkTargets
 {
-    /** @var array<string, array{address: string, title: string, sections: array<string, string>, clientTier: bool, status: string}> */
+    /** @var array<string, array{address: string, title: string, sections: array<string, string>, clientTier: bool, status: string, jointOnly: bool, waitingForDemo: bool}> */
     private array $articles = [];
 
     /** @var array<string, array{address: string, words: ?string}> keyed "staff:<term>" or "client:<term>" */
@@ -25,11 +25,11 @@ final class LinkTargets
 
     /**
      * @param  array<string, string>  $sections  Each Section Name with its heading's words.
-     * @param  'Published'|'Draft'|'Retired'  $status
+     * @param  'Published'|'Draft'|'Retired'  $status  'Draft' too for a Published Article waiting for the demo ($waitingForDemo)
      */
-    public function article(string $name, string $address, string $title, array $sections, bool $clientTier, string $status): self
+    public function article(string $name, string $address, string $title, array $sections, bool $clientTier, string $status, bool $jointOnly = false, bool $waitingForDemo = false): self
     {
-        $this->articles[$name] = compact('address', 'title', 'sections', 'clientTier', 'status');
+        $this->articles[$name] = compact('address', 'title', 'sections', 'clientTier', 'status', 'jointOnly', 'waitingForDemo');
 
         return $this;
     }
@@ -69,7 +69,7 @@ final class LinkTargets
         return $this->pages[(string) strtok($path, '?#')] ?? null;
     }
 
-    /** @return array{address: string, title: string, sections: array<string, string>, clientTier: bool, status: string}|null */
+    /** @return array{address: string, title: string, sections: array<string, string>, clientTier: bool, status: string, jointOnly: bool, waitingForDemo: bool}|null */
     public function findArticle(string $name): ?array
     {
         return $this->articles[$name] ?? null;

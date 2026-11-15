@@ -27,7 +27,7 @@ beforeEach(function () {
             2. Select **Complete receiving**.
             MD)
         ->article('count-stock', ['status' => 'Draft'])
-        ->article('print-a-dock-sheet', ['status' => 'Retired', 'what_changed' => 'Stockist no longer prints dock sheets.'])
+        ->article('print-a-dock-sheet', ['status' => 'Retired', 'what_changed' => 'First Mile Manager no longer prints dock sheets.'])
         ->glossaryEntry('zone')
         ->releaseNote('2026-11-02')
         ->publish();

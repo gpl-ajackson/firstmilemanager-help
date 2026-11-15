@@ -28,7 +28,7 @@ function aListedHelpCentre(): FixtureContent
         ->article('a-draft-task', ['title' => 'A draft task', 'status' => 'Draft', 'team_roles' => ['Admin', 'Warehouse Operative']])
         ->article('a-draft-fix', ['title' => 'A draft fix', 'type' => 'Troubleshooting', 'status' => 'Draft'])
         ->article('a-draft-step', ['title' => 'A draft step', 'type' => 'Getting-started', 'path_position' => 3, 'status' => 'Draft'])
-        ->article('an-old-task', ['title' => 'An old task', 'status' => 'Retired', 'what_changed' => 'Stockist no longer does this.', 'team_roles' => ['Admin', 'Warehouse Operative']])
+        ->article('an-old-task', ['title' => 'An old task', 'status' => 'Retired', 'what_changed' => 'First Mile Manager no longer does this.', 'team_roles' => ['Admin', 'Warehouse Operative']])
         ->article('your-deliveries', ['title' => 'Following your deliveries', 'audience_tier' => 'Client'])
         ->article('seeing-your-stock', ['title' => 'Seeing your stock', 'audience_tier' => 'Client', 'product_area' => 'Inventory'])
         ->article('your-account-status', ['title' => 'Your account status', 'audience_tier' => 'Client', 'product_area' => 'Inventory', 'type' => 'Concept'])

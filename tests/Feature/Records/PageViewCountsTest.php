@@ -27,7 +27,7 @@ beforeEach(function () {
     content()
         ->article('receive-at-the-dock')
         ->article('count-stock')
-        ->article('an-old-way', ['status' => 'Retired', 'what_changed' => 'Stockist no longer works this way.'])
+        ->article('an-old-way', ['status' => 'Retired', 'what_changed' => 'First Mile Manager no longer works this way.'])
         ->publish();
 });
 

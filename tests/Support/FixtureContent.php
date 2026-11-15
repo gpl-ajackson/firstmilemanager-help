@@ -31,7 +31,7 @@ final class FixtureContent
     /** The header data every fixture Article starts from: a valid, Published, Staff How-to. */
     public const DEFAULT_HEADER = [
         'title' => null, // made from the Article Name
-        'summary' => 'How to do one task in Stockist, in one sentence.',
+        'summary' => 'How to do one task in First Mile Manager, in one sentence.',
         'type' => 'How-to',
         'product_area' => 'Inbound',
         'audience_tier' => 'Staff',
@@ -173,7 +173,7 @@ final class FixtureContent
      */
     public function releaseNote(string $date, array $header = [], ?string $body = null): self
     {
-        $header = array_merge(['summary' => 'What changed in Stockist on '.$date.'.', 'changes' => [[]]], $header);
+        $header = array_merge(['summary' => 'What changed in First Mile Manager on '.$date.'.', 'changes' => [[]]], $header);
         if (is_array($header['changes'])) {
             $header['changes'] = array_map(
                 fn (mixed $change): mixed => is_array($change) ? array_filter([...self::DEFAULT_CHANGE, ...$change], fn (mixed $value): bool => $value !== null) : $change,

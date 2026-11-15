@@ -7,8 +7,9 @@ use App\LaunchChecks\Findings;
 use App\Pictures\PictureLibrary;
 
 /**
- * A Client-tier page never names Stockist (plan rule 6): clients see their 3PL's help, so it says
- * "your 3PL". Anything a reader sees counts: the header data the page shows (title, summary,
+ * A Client-tier page never names Stockist (plan rule 6): clients see their courier's help, so it
+ * says "your courier". Nor does any page a reader at an FMM-only Operator can meet (ADR-0006):
+ * every Article but a Joint-only one, and every Glossary Entry. Anything a reader sees counts: the header data the page shows (title, summary,
  * messages, what changed), the body's words, code and diagrams' text included, each Picture's
  * alt text (from its Recipe) and a web link's address. What readers never see doesn't: Section
  * Names, links by name and Picture Names.
@@ -29,20 +30,26 @@ final class StockistOnClientPages
     /** Header data a Client Glossary entry never shows; it shows the rest. */
     private const ENTRY_FIELDS_NOT_SHOWN = ['audience_tier', 'checked_on'];
 
-    public static function check(ArticleFile $article, Findings $findings, PictureLibrary $pictures): void
+    /** What a Client-tier page says instead. */
+    public const FOR_CLIENTS = 'a Client-tier page never names Stockist: say "your courier"';
+
+    /** What any other page an FMM-only reader can meet does instead. */
+    public const FOR_FMM_ONLY = 'a reader at an FMM-only Operator never meets Stockist: put it in a Joint-only Article (joint_only: true)';
+
+    public static function check(ArticleFile $article, Findings $findings, PictureLibrary $pictures, string $instead = self::FOR_CLIENTS): void
     {
-        self::checkPage($article, self::SHOWN_FIELDS, $findings, $pictures);
+        self::checkPage($article, self::SHOWN_FIELDS, $findings, $pictures, $instead);
     }
 
-    /** A Client Glossary entry (content/client-glossary/<term>.md), read as header data and a body. */
-    public static function checkEntry(ArticleFile $entry, Findings $findings, PictureLibrary $pictures): void
+    /** A Glossary Entry (content/glossary/ or content/client-glossary/<term>.md), read as header data and a body. */
+    public static function checkEntry(ArticleFile $entry, Findings $findings, PictureLibrary $pictures, string $instead = self::FOR_CLIENTS): void
     {
         $shown = array_diff(array_map(strval(...), array_keys($entry->header)), self::ENTRY_FIELDS_NOT_SHOWN);
-        self::checkPage($entry, array_values($shown), $findings, $pictures);
+        self::checkPage($entry, array_values($shown), $findings, $pictures, $instead);
     }
 
     /** @param  list<string>  $shownFields */
-    private static function checkPage(ArticleFile $article, array $shownFields, Findings $findings, PictureLibrary $pictures): void
+    private static function checkPage(ArticleFile $article, array $shownFields, Findings $findings, PictureLibrary $pictures, string $instead): void
     {
         foreach ($shownFields as $field) {
             $values = $article->header[$field] ?? null;
@@ -51,7 +58,7 @@ final class StockistOnClientPages
                 $text = is_array($value) ? implode(' ', array_filter(array_map(fn (mixed $part): string => is_scalar($part) ? (string) $part : '', $value))) : $value;
                 if (is_string($text) && self::names($text)) {
                     $line = is_array($values) && is_string($value) ? $article->lineOfItem($field, $value) : $article->lineOf($field);
-                    self::fail($findings, $article, $line, 'its '.str_replace('_', ' ', $field));
+                    self::fail($findings, $article, $line, 'its '.str_replace('_', ' ', $field), $instead);
                 }
             }
         }
@@ -97,7 +104,7 @@ final class StockistOnClientPages
             }
 
             foreach (array_unique($where) as $place) {
-                self::fail($findings, $article, $line, $place);
+                self::fail($findings, $article, $line, $place, $instead);
             }
         }
     }
@@ -107,9 +114,8 @@ final class StockistOnClientPages
         return stripos($text, 'stockist') !== false;
     }
 
-    private static function fail(Findings $findings, ArticleFile $article, int $line, string $place): void
+    private static function fail(Findings $findings, ArticleFile $article, int $line, string $place, string $instead): void
     {
-        $findings->fail(self::RULE, $article->file, $line,
-            "\"Stockist\" in {$place}; a Client-tier page never names Stockist: say \"your courier\"");
+        $findings->fail(self::RULE, $article->file, $line, "\"Stockist\" in {$place}; {$instead}");
     }
 }

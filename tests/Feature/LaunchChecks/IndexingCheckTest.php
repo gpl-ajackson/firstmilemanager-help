@@ -24,7 +24,7 @@ function anIndexedHelpCentre(): FixtureContent
         ->article('receive-at-the-dock', ['title' => 'Receive at the dock'])
         ->article('add-a-warehouse', ['title' => 'Add a warehouse', 'product_area' => 'Warehouses'])
         ->article('count-stock', ['status' => 'Draft'])
-        ->article('print-a-dock-sheet', ['status' => 'Retired', 'what_changed' => 'Stockist no longer prints dock sheets.'])
+        ->article('print-a-dock-sheet', ['status' => 'Retired', 'what_changed' => 'First Mile Manager no longer prints dock sheets.'])
         ->article('book-a-receiving-slot', ['status' => 'Retired', 'replacement' => 'receive-at-the-dock'])
         ->glossaryEntry('zone');
 }
@@ -142,7 +142,7 @@ it('fails a sitemap listing a noindex page, a page that isn\'t there or another 
 it('fails search results and retired notices that search engines may index', function () {
     Route::get('/search', fn () => response('<!doctype html><title>Search</title><p>Results</p>'));
     Route::get('/articles/{name}', fn (string $name) => $name === 'print-a-dock-sheet'
-        ? response('<!doctype html><title>Retired</title><p>Stockist no longer prints dock sheets.</p>', 410)
+        ? response('<!doctype html><title>Retired</title><p>First Mile Manager no longer prints dock sheets.</p>', 410)
         : app()->call([app(ShowArticle::class), '__invoke'], ['name' => $name]));
 
     $run = indexingRun(anIndexedHelpCentre())->run();
