@@ -49,7 +49,7 @@ function aHelpCentreOfEveryKind(): void
         ->article('add-a-warehouse', ['title' => 'Add a warehouse', 'product_area' => 'Warehouses', 'type' => 'Getting-started'])
         ->article('see-your-stock', ['title' => 'See your stock', 'audience_tier' => 'Client', 'product_area' => 'Inventory'])
         ->article('count-stock', ['status' => 'Draft'])
-        ->article('print-a-dock-sheet', ['status' => 'Retired', 'what_changed' => 'Stockist no longer prints dock sheets.'])
+        ->article('print-a-dock-sheet', ['status' => 'Retired', 'what_changed' => 'First Mile Manager no longer prints dock sheets.'])
         ->article('book-a-receiving-slot', ['status' => 'Retired', 'replacement' => 'receive-at-the-dock'])
         ->glossaryEntry('zone')
         ->clientGlossaryEntry('on-hold')
@@ -203,11 +203,11 @@ it('gives AI assistants what the help centre is, its Product Areas and every pub
             '',
             '## Articles: Warehouses',
             '',
-            '- [Add a warehouse](https://help.firstmilemanager.co.uk/articles/add-a-warehouse): How to do one task in Stockist, in one sentence.',
+            '- [Add a warehouse](https://help.firstmilemanager.co.uk/articles/add-a-warehouse): How to do one task in First Mile Manager, in one sentence.',
             '',
             '## Articles: Inbound',
             '',
-            '- [Receive at the dock](https://help.firstmilemanager.co.uk/articles/receive-at-the-dock): How to do one task in Stockist, in one sentence.',
+            '- [Receive at the dock](https://help.firstmilemanager.co.uk/articles/receive-at-the-dock): How to do one task in First Mile Manager, in one sentence.',
             '',
             '## Articles: Inventory',
             '',

@@ -21,7 +21,7 @@ final readonly class ArticleSource
     public const FIELDS = [
         'title', 'summary', 'type', 'product_area', 'audience_tier', 'owner', 'status', 'checked_on',
         'next_review_on', 'team_roles', 'source_references', 'related_articles', 'path_position', 'messages',
-        'replacement', 'what_changed', 'former_addresses',
+        'replacement', 'what_changed', 'former_addresses', 'feature', 'joint_only',
     ];
 
     /**
@@ -30,7 +30,7 @@ final readonly class ArticleSource
      * the place in the path on Getting-started, messages on Troubleshooting, and what changed on
      * a Retired Article with no replacement.
      */
-    public const OPTIONAL_FIELDS = ['team_roles', 'related_articles', 'path_position', 'messages', 'replacement', 'what_changed', 'former_addresses'];
+    public const OPTIONAL_FIELDS = ['team_roles', 'related_articles', 'path_position', 'messages', 'replacement', 'what_changed', 'former_addresses', 'feature', 'joint_only'];
 
     /** A Retired Article's notice says what changed in a short sentence or two. */
     public const WHAT_CHANGED_MAX = 300;
@@ -85,7 +85,28 @@ final readonly class ArticleSource
         public int $bodyLine = 1,
         /** @var list<string> The header data's lines, from the file's second line. */
         private array $headerLines = [],
+        /** The feature it is about, as content/features.yaml names it; it shows once that is on the demo. */
+        public ?string $feature = null,
+        /**
+         * Joint-only (ADR-0006): about Stockist, for readers at a Joint Operator. It is never
+         * listed, searched or in the sitemap, and says "noindex", so a reader at an FMM-only
+         * Operator never meets it; Joint-only pages link to it and its address opens it.
+         */
+        public bool $jointOnly = false,
+        /** Published, but its feature isn't on the demo yet, so it waits hidden as a Draft does. */
+        public bool $waitingForDemo = false,
     ) {}
+
+    /** This Article as a rebuild stores it while its feature isn't on the demo: hidden, as a Draft is. */
+    public function waitingForDemo(): self
+    {
+        return new self(
+            $this->name, $this->file, $this->title, $this->summary, $this->type, $this->productArea, $this->audienceTier,
+            $this->owner, ArticleStatus::Draft, $this->checkedOn, $this->nextReviewOn, $this->teamRoles, $this->sourceReferences,
+            $this->relatedArticles, $this->pathPosition, $this->messages, $this->body, $this->replacement, $this->whatChanged,
+            $this->formerAddresses, $this->bodyLine, $this->headerLines, $this->feature, $this->jointOnly, waitingForDemo: true,
+        );
+    }
 
     /**
      * The file's line holding one item of a header data list (such as one of the related
@@ -135,8 +156,6 @@ final readonly class ArticleSource
         $name = basename($path, '.md');
         if (preg_match('/\A'.self::NAME_PATTERN.'\z/', $name) !== 1) {
             $problem('Article Name', "\"{$name}\" must be lower-case letters and numbers joined by single hyphens");
-        } elseif (str_contains($name, 'stockist')) {
-            $problem('Article Name', "\"{$name}\" must not contain \"stockist\", so it reads correctly to any reader");
         }
 
         $contents = (string) file_get_contents($path);
@@ -212,6 +231,25 @@ final readonly class ArticleSource
             }
         }
 
+        $feature = self::isMissing($header, 'feature') ? null : self::text($header, 'feature', null, $problem);
+        $jointOnly = false;
+        if (! self::isMissing($header, 'joint_only')) {
+            if (! is_bool($header['joint_only'])) {
+                $problem('joint_only', 'must be true or false');
+            } else {
+                $jointOnly = $header['joint_only'];
+            }
+        }
+        if ($jointOnly && $audienceTier === AudienceTier::Client) {
+            $problem('joint_only', 'can\'t be on a Client-tier Article: an Operator\'s clients never meet Stockist');
+        }
+        if ($jointOnly && $type === ArticleType::GettingStarted) {
+            $problem('joint_only', 'can\'t be on a Getting-started Article: every reader follows the path');
+        }
+        if (! $jointOnly && str_contains($name, 'stockist')) {
+            $problem('Article Name', "\"{$name}\" must not contain \"stockist\": only a Joint-only Article (joint_only: true) names Stockist, since a reader at an FMM-only Operator never sees it");
+        }
+
         $pathPosition = self::pathPosition($header, $type, $problem);
         $messages = self::messages($header, $type, $problem);
 
@@ -236,7 +274,7 @@ final readonly class ArticleSource
         return new self(
             $name, $file, $title, $summary, $type, $productArea, $audienceTier, $owner, $status, $checkedOn,
             $nextReviewOn, $teamRoles, $sourceReferences, $relatedArticles, $pathPosition, $messages, $body,
-            $replacement, $whatChanged, $formerAddresses, $bodyLine, $headerLines,
+            $replacement, $whatChanged, $formerAddresses, $bodyLine, $headerLines, $feature, $jointOnly,
         );
     }
 

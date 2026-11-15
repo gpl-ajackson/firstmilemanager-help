@@ -129,7 +129,7 @@ it('links a Published page only to Published Articles, while a Draft may link to
     $output = content()
         ->article('new-feature', ['status' => 'Draft'], "See [the other draft](article:other-draft).\n")
         ->article('other-draft', ['status' => 'Draft'])
-        ->article('old-way', ['status' => 'Retired', 'what_changed' => 'Stockist does this for you now.'])
+        ->article('old-way', ['status' => 'Retired', 'what_changed' => 'First Mile Manager does this for you now.'])
         ->article('receive-a-delivery', [], "See [the new feature](article:new-feature) and [the old way](article:old-way).\n")
         ->rebuild()['output'];
 
@@ -193,7 +193,7 @@ it('lists related articles that lead nowhere for the page\'s readers, with their
 
 it('lists nothing for a Retired Article, whose body no reader sees', function () {
     $output = content()
-        ->article('old-way', ['status' => 'Retired', 'what_changed' => 'Stockist does this for you now.'], "See [gone](article:gone).\n")
+        ->article('old-way', ['status' => 'Retired', 'what_changed' => 'First Mile Manager does this for you now.'], "See [gone](article:gone).\n")
         ->rebuild()['output'];
 
     expect($output)->not->toContain('lead');

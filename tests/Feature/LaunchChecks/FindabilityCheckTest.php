@@ -188,3 +188,20 @@ it('fails when Meilisearch can\'t be used, rather than passing the questions uns
         ->and(findabilityLines($run))->toHaveCount(1)
         ->and(findabilityLines($run)[0])->toStartWith('findability-set.yaml [findability.search] the questions couldn\'t be searched: Meilisearch at http://127.0.0.1:9 can\'t be used');
 });
+
+it('searches an Article still waiting for the demo as readers will once it is there (ADR-0006)', function () {
+    $content = aFindableHelpCentre()
+        ->file('features.yaml', "Goods in:\n  spec: fmm#99\n  on_demo: false\n")
+        ->article('quarantine-stock', ['title' => 'Quarantine stock', 'summary' => 'How to keep stock out of picking until it is checked.', 'feature' => 'Goods in']);
+
+    expect(findabilityLines(findabilityRun($content)))->toBe([]);
+});
+
+it('fails a question whose answer is a Joint-only Article, which search never shows', function () {
+    $content = aFindableHelpCentre()
+        ->article('quarantine-stock', ['title' => 'Quarantine stock', 'summary' => 'How to keep stock out of picking until it is checked.', 'joint_only' => true]);
+
+    expect(findabilityLines(findabilityRun($content)))->toContain(
+        'findability-set.yaml:7 [findability.answer] "quarentine" names /articles/quarantine-stock, but "quarantine-stock" is Joint-only, and search never shows a Joint-only Article',
+    );
+});

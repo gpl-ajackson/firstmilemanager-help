@@ -18,10 +18,12 @@ final readonly class RebuildSummary
         public int $releaseNotes = 0,
         /** Change Summaries waiting in the Next Release folder (checked, never shown). */
         public int $changeSummaries = 0,
+        /** Published Articles waiting, hidden, for their feature to reach the demo (ADR-0006). */
+        public int $waitingForDemo = 0,
     ) {}
 
     public function articles(): int
     {
-        return $this->published + $this->drafts + $this->retired;
+        return $this->published + $this->waitingForDemo + $this->drafts + $this->retired;
     }
 }

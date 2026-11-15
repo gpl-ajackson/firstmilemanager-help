@@ -56,7 +56,7 @@ it('shows a Retired Article with no replacement as a short notice of what change
             'title' => 'Print a dock sheet',
             'product_area' => 'Inbound',
             'status' => 'Retired',
-            'what_changed' => 'Stockist no longer prints dock sheets: the Dock Receiving Terminal shows each shipment instead.',
+            'what_changed' => 'First Mile Manager no longer prints dock sheets: the Dock Receiving Terminal shows each shipment instead.',
         ], "## Steps\n\nPress Print on the shipment.\n")
         ->article('receive-at-the-dock', ['product_area' => 'Inbound'])
         ->publish();
@@ -65,7 +65,7 @@ it('shows a Retired Article with no replacement as a short notice of what change
         ->assertStatus(410)
         ->assertSee('<title>Print a dock sheet (retired) | First Mile Manager Help centre</title>', escape: false)
         ->assertSee('Print a dock sheet')
-        ->assertSee('Stockist no longer prints dock sheets: the Dock Receiving Terminal shows each shipment instead.')
+        ->assertSee('First Mile Manager no longer prints dock sheets: the Dock Receiving Terminal shows each shipment instead.')
         ->assertSee('<a href="/areas/inbound">', escape: false)
         ->assertSee('action="/search"', escape: false)
         ->assertDontSee('Press Print on the shipment.');
@@ -76,7 +76,7 @@ it('leaves out the Product Area link when the area has no Published Article to s
         ->article('print-a-dock-sheet', [
             'product_area' => 'Returns',
             'status' => 'Retired',
-            'what_changed' => 'Stockist no longer prints dock sheets.',
+            'what_changed' => 'First Mile Manager no longer prints dock sheets.',
         ])
         ->publish();
 
@@ -89,7 +89,7 @@ it('leaves out the Product Area link when the area has no Published Article to s
 it('marks the retired notice "noindex", even once the help centre has gone public', function () {
     config(['help.going_public' => true]);
     content()
-        ->article('print-a-dock-sheet', ['status' => 'Retired', 'what_changed' => 'Stockist no longer prints dock sheets.'])
+        ->article('print-a-dock-sheet', ['status' => 'Retired', 'what_changed' => 'First Mile Manager no longer prints dock sheets.'])
         ->article('receive-at-the-dock')
         ->publish();
 

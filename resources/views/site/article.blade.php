@@ -12,7 +12,7 @@
     // On a task, the Team Roles are who can do it; on the rest, who it is written for.
     $rolesLabel = in_array($article->type, [ArticleType::HowTo, ArticleType::GettingStarted], true) ? 'Who can do this' : 'For';
 @endphp
-<x-site.layout :title="$article->title" :description="$article->summary">
+<x-site.layout :title="$article->title" :description="$article->summary" :noindex="$article->joint_only">
     <nav class="crumbs" aria-label="Breadcrumb">
         <ol>
             <li><a href="/">Help centre</a></li>
@@ -28,7 +28,11 @@
                 @endif
                 @if ($article->status === ArticleStatus::Draft)
                     {{-- Only a Help Preview shows a Draft (#59). --}}
-                    <p class="draft-marker"><span class="badge badge-draft">Draft</span> Readers can’t see this Article yet: it shows only in Help Previews until its status is Published.</p>
+                    @if ($article->waiting_for_demo)
+                        <p class="draft-marker"><span class="badge badge-draft">Waiting for the demo</span> Readers can’t see this Article yet: it shows once “{{ $article->feature }}” is on the demo.</p>
+                    @else
+                        <p class="draft-marker"><span class="badge badge-draft">Draft</span> Readers can’t see this Article yet: it shows only in Help Previews until its status is Published.</p>
+                    @endif
                 @endif
                 <h1>{{ $article->title }}</h1>
                 <ul class="details" aria-label="About this article">

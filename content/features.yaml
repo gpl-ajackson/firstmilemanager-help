@@ -1,0 +1,11 @@
+# The features help is written about, and whether each is on the demo yet (ADR-0006). An Article
+# names its feature in its header data (feature: <name>); once Published, it stays hidden, as a
+# Draft is, until its feature is on the demo. The FMM Release that puts a feature on the demo sets
+# its on_demo to true, in the help pull request that goes with that release.
+#
+#   <Feature name>:
+#     spec: fmm#<n>          the main-project spec that builds it
+#     on_demo: true | false
+Staff sign-in and roles:
+  spec: fmm#57
+  on_demo: false

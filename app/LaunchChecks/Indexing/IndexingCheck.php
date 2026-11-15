@@ -27,7 +27,8 @@ use Throwable;
  *   by following links from the home that answers 200 without "noindex"; and nothing else.
  * - Search results (/search, with words and without) and each Retired Article's notice say
  *   "noindex".
- * - /llms.txt lists every Published Article, and no other.
+ * - /llms.txt lists every Published Article, and no other, but those still waiting for their
+ *   feature to reach the demo and the Joint-only ones (ADR-0006), which are never listed.
  * - The help centre's facts (content/facts.yaml: name, description, stage and the marketing
  *   site's address) are word for word the marketing site's src/data/site.ts at main.
  *
@@ -209,7 +210,7 @@ final readonly class IndexingCheck implements Check
         return array_keys($seen);
     }
 
-    /** llms.txt lists every Published Article, and no other. */
+    /** llms.txt lists every Published Article that is shown and not Joint-only, and no other. */
     private function llmsTxt(CheckContext $context, Visitor $visitor, Findings $findings): void
     {
         $llms = $visitor->visit('/llms.txt');
@@ -221,10 +222,16 @@ final readonly class IndexingCheck implements Check
 
         preg_match_all('~\]\(\s*'.preg_quote(self::siteAddress(), '~').'(/articles/[a-z0-9-]+)\s*\)~', $llms->body, $matches);
         $listed = array_flip($matches[1]);
+        $targets = $context->content()->linkTargets;
         foreach ($context->articles() as $article) {
             $address = ArticleSource::addressOf($article->name);
             $status = $article->text('status');
-            if ($status === ArticleStatus::Published->value && ! isset($listed[$address])) {
+            $target = $targets?->findArticle($article->name);
+            if ($status === ArticleStatus::Published->value && ($target === null || $target['waitingForDemo'] || $target['jointOnly'])) {
+                if (isset($listed[$address])) {
+                    $findings->fail(self::LLMS_TXT, $article->file, null, "/llms.txt lists {$address}, but this Article is ".($target['jointOnly'] ?? false ? 'Joint-only' : 'waiting for the demo').', so it is never listed');
+                }
+            } elseif ($status === ArticleStatus::Published->value && ! isset($listed[$address])) {
                 $findings->fail(self::LLMS_TXT, $article->file, null, "/llms.txt doesn't list this Published Article ({$address})");
             } elseif ($status !== ArticleStatus::Published->value && isset($listed[$address])) {
                 $findings->fail(self::LLMS_TXT, $article->file, null, "/llms.txt lists {$address}, but this Article is {$status}: only Published Articles are listed");

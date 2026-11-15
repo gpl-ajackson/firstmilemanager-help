@@ -113,9 +113,9 @@ it('fails a Client-tier page that names Stockist in its words, a Picture\'s alt 
         ]);
 });
 
-it('lets a staff page name Stockist, and a Client-tier page name it only where readers never see it', function () {
+it('lets a Joint-only page name Stockist, and a Client-tier page name it only where readers never see it', function () {
     $run = launchChecks(linkedContent()
-        ->article('receive-a-delivery', ['summary' => 'How to receive a delivery in Stockist, in one sentence.', 'related_articles' => ['book-in-a-delivery', 'how-deliveries-work']],
+        ->article('stockist-deliveries', ['summary' => 'How Stockist receives a delivery, in one sentence.', 'related_articles' => ['book-in-a-delivery', 'how-deliveries-work'], 'joint_only' => true],
             "## Check the ASN {#check-the-asn}\n\nStockist checks it.\n")
         ->picture('client-stockist-account', ['alt' => 'Your account page, with your company name outlined.'])
         ->article('your-account', ['audience_tier' => 'Client', 'related_articles' => ['follow-your-deliveries', 'see-your-stock']],
@@ -158,4 +158,26 @@ it('fails a Client Glossary entry that names Stockist in anything a reader sees'
         'client-glossary/delivery.md:4 [links.stockist] "Stockist" in its where you see it; a Client-tier page never names Stockist: say "your courier"',
         'client-glossary/delivery.md:10 [links.stockist] "Stockist" in its words; a Client-tier page never names Stockist: say "your courier"',
     ]);
+});
+
+it('fails Stockist on a staff page or Glossary Entry that isn\'t Joint-only, since FMM-only readers meet it (ADR-0006)', function () {
+    $run = launchChecks(linkedContent()
+        ->article('receive-a-delivery', ['summary' => 'How to receive a delivery in Stockist, in one sentence.', 'related_articles' => ['book-in-a-delivery', 'how-deliveries-work']])
+        ->glossaryEntry('location', [], 'A place in Stockist.'))
+        ->against(linkedProject())->run();
+
+    expect($run->failures('links'))->toContain(
+        'articles/receive-a-delivery.md:3 [links.stockist] "Stockist" in its summary; a reader at an FMM-only Operator never meets Stockist: put it in a Joint-only Article (joint_only: true)',
+    )->and(array_values(array_filter($run->failures('links'), fn (string $line): bool => str_starts_with($line, 'glossary/location.md'))))->toHaveCount(1);
+});
+
+it('fails a link from a page that isn\'t Joint-only to a Joint-only Article', function () {
+    $run = launchChecks(linkedContent()
+        ->article('stockist-deliveries', ['joint_only' => true, 'related_articles' => ['receive-a-delivery', 'book-in-a-delivery']])
+        ->article('receive-a-delivery', ['related_articles' => ['book-in-a-delivery', 'how-deliveries-work']], "See [the other side](article:stockist-deliveries).\n"))
+        ->against(linkedProject())->run();
+
+    expect($run->failures('links'))->toContain(
+        'articles/receive-a-delivery.md:20 [links.resolves] link "article:stockist-deliveries": "stockist-deliveries" is Joint-only, so only a Joint-only Article links to it: a reader at an FMM-only Operator never meets Stockist',
+    );
 });

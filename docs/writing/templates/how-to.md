@@ -29,6 +29,8 @@ product_area: Clients                # exactly as the app's menu names it (conte
 audience_tier: Staff             # or Client
 owner: gpl-ajackson                  # the Article Owner's GitHub login; never shown to readers
 status: Draft                        # Draft, Published or Retired
+feature: Staff sign-in and roles       # the feature it is about (content/features.yaml); it shows once that is on the demo. Left out on help-centre pages
+# joint_only: true                  # only for an Article about Stockist, for Joint Operators: never listed or searched
 checked_on: 2026-10-27               # the day you last made a Demo Walk of it
 next_review_on: 2027-04-27           # at most six months after checked_on
 team_roles: [Admin, Account Manager, Finance Manager]   # who can do the task in First Mile Manager as built; left out on a Client-tier Article

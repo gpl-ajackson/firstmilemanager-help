@@ -56,7 +56,8 @@ final class RebuildCommand extends Command
         }
 
         $this->info("Rebuilt {$summary->articles()} ".Str::plural('Article', $summary->articles())." from {$path}: "
-            ."{$summary->published} published, {$summary->drafts} draft, {$summary->retired} retired.");
+            ."{$summary->published} published, ".($summary->waitingForDemo > 0 ? "{$summary->waitingForDemo} waiting for the demo, " : '')
+            ."{$summary->drafts} draft, {$summary->retired} retired.");
         $entries = $summary->glossaryEntries + $summary->clientGlossaryEntries;
         $this->info("Rebuilt {$entries} Glossary ".Str::plural('Entry', $entries).': '
             ."{$summary->glossaryEntries} in the Glossary, {$summary->clientGlossaryEntries} in the Client Glossary.");

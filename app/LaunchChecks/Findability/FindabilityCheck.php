@@ -105,7 +105,8 @@ final readonly class FindabilityCheck implements Check
         $connection = $this->database->connection();
         $connection->beginTransaction();
         try {
-            $this->library->rebuild($context->contentPath, $context->picturesPath);
+            // As readers will search it: an Article waiting for the demo is searched as if it were there.
+            $this->library->rebuild($context->contentPath, $context->picturesPath, everyFeatureOnDemo: true);
 
             return $this->search->inFreshIndex(fn (SearchService $search): array => array_map(
                 fn (NamedAnswer $question): Results => $search->search($question->question, Scope::helpCentre()),
@@ -175,8 +176,11 @@ final readonly class FindabilityCheck implements Check
                 ? "\"{$question->name}\" is now /articles/{$renamed[$question->name]}: name it by its name now"
                 : "there is no Article named \"{$question->name}\"";
         }
-        if ($article['status'] !== 'Published') {
+        if ($article['status'] !== 'Published' && ! $article['waitingForDemo']) {
             return "\"{$question->name}\" is {$article['status']}, and search shows only Published Articles";
+        }
+        if ($article['jointOnly']) {
+            return "\"{$question->name}\" is Joint-only, and search never shows a Joint-only Article";
         }
         if ($question->section !== null && ! array_key_exists($question->section, $article['sections'])) {
             return "\"{$question->name}\" has no Section named \"{$question->section}\"";
