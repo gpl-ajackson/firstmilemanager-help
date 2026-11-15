@@ -36,11 +36,13 @@ Operator:
 Connection:
   status: Published
   product_area: Settings
+  ahead: true
   fingerprint: 7661502fbb01
   stockist_fingerprint: '156131839347'
 Setup Type:
   status: Published
   product_area: Settings
+  ahead: true
   fingerprint: d4e544a53034
   stockist_fingerprint: '2c73ff5e1214'
 'FMM-only':
@@ -66,6 +68,7 @@ Headless Team:
 Team Role:
   status: Published
   product_area: People
+  ahead: true
   fingerprint: cf0f6d372fb4
   stockist_fingerprint: 'f1a5eb168927'
 Staff Role:
@@ -86,6 +89,7 @@ Admin:
 Finance Manager:
   status: Published
   product_area: People
+  ahead: true
   fingerprint: 17bfb143861e
   stockist_fingerprint: '58aa9337275d'
 Account Manager:
@@ -96,6 +100,7 @@ Account Manager:
 Transport Manager:
   status: Published
   product_area: People
+  ahead: true
   fingerprint: 42c65a446693
 Driver:
   status: Published
@@ -114,6 +119,7 @@ Warehouse Operative:
 Worker Type:
   status: Published
   product_area: People
+  ahead: true
   fingerprint: 95c8df42ffe2
 
 # Clients
