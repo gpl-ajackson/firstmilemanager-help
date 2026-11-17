@@ -48,7 +48,7 @@ final class WeeklyGlossaryReport
             }
             $lines[] = '';
         }
-        $lines[] = '<sub>Run it locally: `php artisan help:glossary-check --main-project=<path to a stockist checkout>`.</sub>';
+        $lines[] = '<sub>Run it locally: `php artisan help:glossary-check --main-project=<path to a firstmilemanager checkout> --stockist=<path to a stockist checkout>`.</sub>';
 
         return implode("\n", $lines)."\n";
     }
