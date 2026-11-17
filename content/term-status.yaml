@@ -38,13 +38,13 @@ Connection:
   product_area: Settings
   ahead: true
   fingerprint: 7661502fbb01
-  stockist_fingerprint: '156131839347'
+  stockist_fingerprint: '13ea11f541f6'
 Setup Type:
   status: Published
   product_area: Settings
   ahead: true
   fingerprint: d4e544a53034
-  stockist_fingerprint: '2c73ff5e1214'
+  stockist_fingerprint: '200e87cc2d47'
 'FMM-only':
   status: Internal
   product_area: Settings
@@ -57,7 +57,7 @@ Headless Team:
   status: Internal
   product_area: Settings
   fingerprint: 4a9b43a1d508
-  stockist_fingerprint: 'cfe3cf2c290b'
+  stockist_fingerprint: 'b81f9db5c424'
 
 # People, sign-ins and roles
 
