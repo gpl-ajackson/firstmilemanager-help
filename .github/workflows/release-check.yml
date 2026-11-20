@@ -84,13 +84,13 @@ jobs:
         run: echo "RELEASE_CHECK=$RUNNER_TEMP/release-check.md" >> "$GITHUB_ENV"
 
       # The main project is private, so the check reads it with the read-only key AJ adds as a
-      # repository secret under ticket #32. Without it the check can't run, and that fails.
+      # repository secret under help#2 (docs/putting-it-live.md). Without it the check can't run, and that fails.
       - name: Check for the main project's read-only key
         env:
           FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
         run: |
           if [ -z "$FMM_READ_TOKEN" ]; then
-            echo "::error title=Missing secret FMM_READ_TOKEN (help#2)::The Release Check reads the main project (gpl-ajackson/firstmilemanager) and its pull requests with the repository secret FMM_READ_TOKEN, a read-only key AJ adds under ticket #32, and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            echo "::error title=Missing secret FMM_READ_TOKEN (help#2)::The Release Check reads the main project (gpl-ajackson/firstmilemanager) and its pull requests with the repository secret FMM_READ_TOKEN, a read-only key AJ adds under help#2 (docs/putting-it-live.md), and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
             exit 1
           fi
 

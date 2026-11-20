@@ -74,5 +74,5 @@ The jobs in `routes/console.php` (forgetting rate-limit keys, sending "doesn't m
 
 Names only; the values are kept in GitHub and Forge, never in the repository, issues or logs.
 
-- GitHub repository secrets: `HELP_DEPLOY_HOOK_URL` (Forge's deploy hook, used only by the Deploy workflow) `FMM_READ_TOKEN` (the Launch Checks read the main project and the marketing site with it), and `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` (the Access service token `help-centre-ci`, used only by the run for the Launch Check issue).
+- GitHub repository secrets: `HELP_DEPLOY_HOOK_URL` (Forge's deploy hook, used only by the Deploy workflow) `FMM_READ_TOKEN` (the checks read the main project, the marketing site and Stockist's `GLOSSARY.md` with it), `STOCKIST_READ_TOKEN` (the picture tool, until help#3), and `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` (the Access service token `help-centre-ci`, used only by the run for the Launch Check issue).
 - The server's environment in Forge: `MEILISEARCH_KEY`, `HELP_GITHUB_ISSUES_TOKEN`, the backup store's `HELP_BACKUP_ENDPOINT`, `HELP_BACKUP_BUCKET`, `HELP_BACKUP_KEY` and `HELP_BACKUP_SECRET`, and Better Stack's `HELP_UPTIME_API_TOKEN` and `HELP_UPTIME_MONITOR_IDS`, with the rest of the site's settings.

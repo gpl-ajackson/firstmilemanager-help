@@ -105,7 +105,7 @@ jobs:
           echo "DESCRIPTION_FILE=$RUNNER_TEMP/pull-request-description.md" >> "$GITHUB_ENV"
 
       # The main project is private, so the checks read it with the read-only key AJ adds as a
-      # repository secret under ticket #32. Without it they can't run, and that fails the build.
+      # repository secret under help#2 (docs/putting-it-live.md). Without it they can't run, and that fails the build.
       - name: Check for the Access service token (the run for the Launch Check issue)
         if: env.LAUNCH_RUN == 'true'
         env:
@@ -124,7 +124,7 @@ jobs:
           FMM_READ_TOKEN: ${{ secrets.FMM_READ_TOKEN }}
         run: |
           if [ -z "$FMM_READ_TOKEN" ]; then
-            message="The Launch Checks read the main project (gpl-ajackson/firstmilemanager) with the repository secret FMM_READ_TOKEN, a read-only key AJ adds under ticket #32, and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
+            message="The Launch Checks read the main project (gpl-ajackson/firstmilemanager) with the repository secret FMM_READ_TOKEN, a read-only key AJ adds under help#2 (docs/putting-it-live.md), and it is missing. Add it under Settings › Secrets and variables › Actions, then re-run this job."
             echo "::error title=Missing secret FMM_READ_TOKEN (help#2)::${message}"
             printf '<!-- help-launch-checks -->\n## Launch Checks\n\n**Could not run:** %s\n' "$message" > "$FINDINGS"
             exit 1

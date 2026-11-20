@@ -52,7 +52,7 @@ final class MarkdownReport
             $lines[] = "_Not run:_ {$notRun}.";
         }
         $lines[] = '';
-        $lines[] = "<sub>Main project read at `{$mainProjectRef}`. Run locally: `php artisan help:launch-checks --main-project=<path to a stockist checkout>".($picturesOnly ? ' --pictures-only --take-pictures=changed --pictures-base=origin/main' : '').'`.</sub>';
+        $lines[] = "<sub>Main project read at `{$mainProjectRef}`. Run locally: `php artisan help:launch-checks --main-project=<path to a firstmilemanager checkout> --stockist=<path to a stockist checkout>".($picturesOnly ? ' --pictures-only --take-pictures=changed --pictures-base=origin/main' : '').'`.</sub>';
 
         $markdown = implode("\n", $lines)."\n";
 
