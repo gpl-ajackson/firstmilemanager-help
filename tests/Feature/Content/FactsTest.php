@@ -40,6 +40,13 @@ it('says what First Mile Manager is in the footer, in the marketing site\'s word
     expect(ReaderPage::of($this->get('/'))->text('.site-foot'))->toContain('First Mile Manager is software for small couriers.');
 });
 
+it('says in the footer that First Mile Manager is a CloudBusiness.Software product', function () {
+    content()->publish();
+
+    expect(ReaderPage::of($this->get('/'))->links('.site-foot a'))
+        ->toContain(['A CloudBusiness.Software product', 'https://cloudbusiness.software']);
+});
+
 it('refuses a content folder without its facts', function () {
     $content = content();
     unlink($content->path().'/facts.yaml');
