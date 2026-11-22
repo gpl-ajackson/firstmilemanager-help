@@ -75,6 +75,8 @@
             @endif
             <p>This help centre stores nothing on your device. <a href="/privacy">What we record and how long we keep it</a></p>
             <p class="foot-links"><a href="{{ $facts?->url ?? 'https://firstmilemanager.co.uk' }}">firstmilemanager.co.uk</a></p>
+            {{-- The CloudBusiness.Software endorsement every product site carries (corporate brand plan CR3), as on firstmilemanager.co.uk. --}}
+            <p class="foot-links"><a href="https://cloudbusiness.software">A CloudBusiness.Software product</a></p>
         </div>
     </footer>
 </body>
