@@ -1,0 +1,105 @@
+# When the `in-progress` label is added to an issue, set the issue's Status to
+# "In Progress" on the GitHub Projects board, adding it to the board first if
+# it is missing. Agents (including cloud sessions that cannot reach Projects)
+# only need to apply the label. See docs/agents/issue-tracker.md.
+#
+# Setup:
+#   - secret PROJECT_TOKEN: a personal access token that can write the board
+#     (classic: `project` + `repo` scopes; fine-grained: Projects read/write on
+#     the owner, Issues read on this repo). The default GITHUB_TOKEN cannot
+#     write to a board owned by a personal account.
+#   - variable PROJECT_NUMBER (optional): the board number from its URL
+#     (github.com/users/<owner>/projects/<number>). Needed to add issues that
+#     are not on the board yet; without it, the issue's existing board is used.
+#   - variable PROJECT_OWNER (optional): defaults to the repository owner.
+
+name: Move issue to In Progress
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: read
+
+jobs:
+  set-status:
+    if: github.event.label.name == 'in-progress'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+          PROJECT_OWNER: ${{ vars.PROJECT_OWNER || github.repository_owner }}
+          STATUS_NAME: In Progress
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const owner = process.env.PROJECT_OWNER;
+            const wantedNumber = process.env.PROJECT_NUMBER ? Number(process.env.PROJECT_NUMBER) : null;
+            const statusName = process.env.STATUS_NAME;
+            const issueId = context.payload.issue.node_id;
+            const issueNumber = context.payload.issue.number;
+
+            const fieldsFragment = `
+              id number title
+              field(name: "Status") {
+                ... on ProjectV2SingleSelectField { id options { id name } }
+              }`;
+
+            // The issue's current board items.
+            const { node } = await github.graphql(`
+              query($id: ID!) {
+                node(id: $id) {
+                  ... on Issue {
+                    projectItems(first: 20) {
+                      nodes { id project { ${fieldsFragment} } }
+                    }
+                  }
+                }
+              }`, { id: issueId });
+            const items = node.projectItems.nodes;
+
+            // Pick the board.
+            let project;
+            if (wantedNumber) {
+              const res = await github.graphql(`
+                query($login: String!, $number: Int!) {
+                  user(login: $login) { projectV2(number: $number) { ${fieldsFragment} } }
+                }`, { login: owner, number: wantedNumber });
+              project = res.user && res.user.projectV2;
+              if (!project) core.setFailed(`Board ${owner}/${wantedNumber} not found or not readable with PROJECT_TOKEN.`);
+            } else if (items.length === 1) {
+              project = items[0].project;
+            } else {
+              core.setFailed(items.length === 0
+                ? `Issue #${issueNumber} is not on a board and PROJECT_NUMBER is not set, so there is no board to add it to.`
+                : `Issue #${issueNumber} is on ${items.length} boards; set PROJECT_NUMBER to choose one.`);
+            }
+            if (!project) return;
+
+            const option = project.field && project.field.options.find(o => o.name.toLowerCase() === statusName.toLowerCase());
+            if (!option) {
+              core.setFailed(`Board "${project.title}" has no Status option named "${statusName}".`);
+              return;
+            }
+
+            // Add the issue to the board if it is missing.
+            let itemId = (items.find(i => i.project.id === project.id) || {}).id;
+            if (!itemId) {
+              const added = await github.graphql(`
+                mutation($project: ID!, $content: ID!) {
+                  addProjectV2ItemById(input: { projectId: $project, contentId: $content }) { item { id } }
+                }`, { project: project.id, content: issueId });
+              itemId = added.addProjectV2ItemById.item.id;
+              core.info(`Added #${issueNumber} to "${project.title}".`);
+            }
+
+            await github.graphql(`
+              mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $project, itemId: $item, fieldId: $field,
+                  value: { singleSelectOptionId: $option }
+                }) { projectV2Item { id } }
+              }`, { project: project.id, item: itemId, field: project.field.id, option: option.id });
+            core.info(`Set #${issueNumber} to "${option.name}" on "${project.title}".`);
