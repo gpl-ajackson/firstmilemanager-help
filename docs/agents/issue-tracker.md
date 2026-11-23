@@ -14,6 +14,16 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
+## In progress
+
+**Add the `in-progress` label to a ticket when its implementation starts**, before the first code change for it: `gh issue edit <number> --add-label in-progress`. This applies to every ticket picked up by `/implement`, `/implement-spec` (each ticket as its implementer starts, not the whole spec up front) or by hand. A spec issue gets the label when its first ticket does. Triage labels such as `ready-for-agent` stay on.
+
+The label is the only thing to set. `.github/workflows/in-progress.yml` mirrors it to the project board: it moves the ticket's card to `In progress`, and takes the label off when the issue closes (the board's own workflows then set `Done`). Don't set the board's Status directly: not every session can reach GitHub Projects, and every session can set a label. A session without `gh` adds the label with whatever GitHub tools it has.
+
+If work on a ticket is abandoned, remove the label (`gh issue edit <number> --remove-label in-progress`) and say why in a comment. The card goes back to `Backlog`.
+
+The workflow reaches the board with the `PROJECT_BOARD_TOKEN` repository secret, a classic personal access token with the `repo` and `project` scopes. If its run fails, tell the user rather than moving the card another way.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_

@@ -8,7 +8,7 @@ Issue numbers in code comments and test names (spec #30, #49, #59 and so on) are
 
 ### Issue tracker
 
-GitHub Issues on this repository for the help centre itself; the main repository's issues for specs. See `docs/agents/issue-tracker.md`.
+GitHub Issues on this repository for the help centre itself; the main repository's issues for specs. Add the `in-progress` label to a ticket when its implementation starts. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
