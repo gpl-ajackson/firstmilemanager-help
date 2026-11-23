@@ -14,15 +14,15 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
-## In progress
+## Project board: In Progress
 
-**Add the `in-progress` label to a ticket when its implementation starts**, before the first code change for it: `gh issue edit <number> --add-label in-progress`. This applies to every ticket picked up by `/implement`, `/implement-spec` (each ticket as its implementer starts, not the whole spec up front) or by hand. A spec issue gets the label when its first ticket does. Triage labels such as `ready-for-agent` stay on.
+**Label a ticket `in-progress` when work starts.** When you start implementing a ticket, add the `in-progress` label as part of claiming it, before the first code change: `gh issue edit <n> --add-label in-progress`. Where GraphQL is blocked, use REST instead: `gh api repos/<owner>/<repo>/issues/<n>/labels -f 'labels[]=in-progress'`. A session without `gh` adds the label with whatever GitHub tools it has. "Implementing" covers any session doing the ticket's work, whether that's code, a research write-up or a grilling session. Under `/implement-spec`, each ticket gets the label as its implementer starts, not the whole spec up front.
 
-The label is the only thing to set. `.github/workflows/in-progress.yml` mirrors it to the project board: it moves the ticket's card to `In progress`, and takes the label off when the issue closes (the board's own workflows then set `Done`). Don't set the board's Status directly: not every session can reach GitHub Projects, and every session can set a label. A session without `gh` adds the label with whatever GitHub tools it has.
+The label is all you need to apply, so don't try to set the board Status yourself: `.github/workflows/issue-in-progress.yml` moves the ticket's card to **In Progress**, adding the issue to the board first if it is missing. Leave the label on, and don't set Done: closing the issue or merging its pull request moves the card there.
 
-If work on a ticket is abandoned, remove the label (`gh issue edit <number> --remove-label in-progress`) and say why in a comment. The card goes back to `Backlog`.
+`in-progress` tracks work, not triage, so it may sit beside the triage labels and beside a wayfinding ticket's `wayfinder:` labels.
 
-The workflow reaches the board with the `PROJECT_BOARD_TOKEN` repository secret, a classic personal access token with the `repo` and `project` scopes. If its run fails, tell the user rather than moving the card another way.
+The workflow needs the `in-progress` label to exist, the repository secret `PROJECT_TOKEN` and the repository variable `PROJECT_NUMBER`; its header comment says what each is. If its run fails, tell the user rather than moving the card another way.
 
 ## Pull requests as a triage surface
 
