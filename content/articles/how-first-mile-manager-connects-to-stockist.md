@@ -17,6 +17,7 @@ source_references:
   - ADR-0011
   - ADR-0014
   - ADR-0015
+  - ADR-0016
 related_articles: [sign-in-to-first-mile-manager, invite-people-to-first-mile-manager, staff-roles-in-first-mile-manager, waiting-for-stockist, settle-a-possible-match-in-link-review]
 ---
 
@@ -75,7 +76,7 @@ First Mile Manager then does one of three things.
 
 ### A Sure Match {#sure-match}
 
-The Account Manager gets a message under the bell, naming the Stockist client and its Code. The client's history records the link too. If the two are not the same business, tell your Finance Manager or Admin before the client's first booking.
+The Account Manager gets a message under the bell, naming the Stockist client and its Code. The client's history records the link too. If the two are not the same business, tell your Finance Manager or Admin before the client's first booking. They can [undo the link](#undo-a-link).
 
 A VAT number alone is never a Sure Match, because the companies in a VAT group share one number. A client with no company registration number can't be a Sure Match either.
 
@@ -98,3 +99,50 @@ Choose another Code and save.
 ### When Stockist can't be reached {#client-links-waiting}
 
 Your new client is saved and stays in Onboarding, marked **Waiting for Stockist**. First Mile Manager makes no Shadow Client while it can't ask, because Stockist may already have the business. It asks by itself within a minute of Stockist coming back, and then makes the Client Link. You don't need to do anything.
+
+## Kept in Stockist {#kept-in-stockist}
+
+When a client is linked to a client Stockist already had, Stockist keeps its Code, name, tax and customs numbers and invoice address. The client's page shows them under **Kept in Stockist**, and nobody can change them in First Mile Manager.
+
+- As soon as the link is made, the client takes Stockist's Code and details, so both apps show the same. The Code you set the client up with is free to use again.
+- To change them, change the client in Stockist. The change shows in First Mile Manager by itself, and the client's history records what changed and who changed it.
+- Everything else is still changed in First Mile Manager: Contacts, Collection Addresses, notifications, the Account Manager, the Invoice Frequency, the Difference Rules and the Client Status.
+
+At Trentside Logistics, a new client with Brew Republic Coffee Co.'s company registration number is linked to it by a Sure Match. The client's Code becomes BREW, the Code the warehouse already uses.
+
+If another of your clients already uses Stockist's Code in First Mile Manager, the new client keeps its own Code for now, and its page says so. Change the other client's Code, and the new client takes Stockist's by itself.
+
+### The Client Status in Stockist {#client-status-in-stockist}
+
+Each app keeps its own [Client Status](term:client-status) for the client. The client's page shows **Client Status in Stockist** for information only. It never stops collections. A client that is On Hold in the warehouse can still be Active in First Mile Manager.
+
+## Take-over {#take-over}
+
+A client with a Shadow Client may start using your warehouse as well. Your warehouse team then takes the client over in Stockist, one client at a time. This is a [Take-over](term:take-over): the Shadow Client becomes an ordinary Stockist client, and its Client Link stays.
+
+From then on the client's Code, name, numbers and invoice address are **Kept in Stockist**. The Account Manager gets a message under the bell, and the client's history records the Take-over. Nothing else about the client changes.
+
+A change to the client's details that was still **Waiting for Stockist** at the Take-over is dropped. Stockist refuses it, and the Account Manager gets a message with Stockist's reason:
+
+> Sherwood Print Works is kept in Stockist now, so First Mile Manager can't change its details.
+
+Make the change in Stockist instead.
+
+## Undo a link {#undo-a-link}
+
+A client linked to the wrong Stockist client, or settled the wrong way in Link Review, can be put right before its first booking. A Finance Manager or an Admin opens the client, selects **More**, then **Undo link**, and confirms.
+
+The client goes back to Link Review, beside the same Stockist clients as before. An Onboarding client can't go Active until Link Review is settled again.
+
+| How the client was linked | What undoing does |
+| --- | --- |
+| By a Sure Match, or settled as **Same business** | The link is taken off the Stockist client. The client gets back the Code and details it had in First Mile Manager before the link. |
+| Settled as **Not the same** | Stockist closes the Shadow Client it made. |
+
+**Undo link** shows only while the link can be undone. It does not show:
+
+- after the client's first booking, so that billed work never moves between clients;
+- for a client whose Shadow Client was made by itself, because Stockist had no client that could be the same business;
+- for a client your warehouse team has taken over.
+
+The link is undone in First Mile Manager at once. If Stockist can't be reached, the client shows **Waiting for Stockist** until Stockist has undone its side too.

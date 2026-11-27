@@ -170,10 +170,20 @@ Link Review:
   status: Published
   product_area: Clients
   fingerprint: d4e6ddd58edb
+# Built by fmm#80: the Account Manager is told of a Take-over, and the client is Kept in Stockist
+# from then on. Its entry says "your warehouse system", as the other Client Link entries do.
 'Take-over':
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: 4fe38d00ec6b
+# Built by fmm#80. Like Waiting for Stockist it has no Glossary Entry: the term names Stockist,
+# and every Glossary Entry is a page a reader at an FMM-only Operator can meet (Launch Check 3).
+# The Joint-only Article "How First Mile Manager connects to Stockist" explains it
+# (#kept-in-stockist).
+Kept in Stockist:
+  status: Published
+  product_area: Clients
+  fingerprint: fbcfc4271862
 # Built by fmm#75. It has no Glossary Entry yet: the term names Stockist, and every Glossary Entry
 # is a page a reader at an FMM-only Operator can meet (Launch Check 3). The Joint-only Article
 # "Waiting for Stockist" explains it, and FMM-only readers have "Still saving". An entry needs
