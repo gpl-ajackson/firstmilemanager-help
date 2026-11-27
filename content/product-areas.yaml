@@ -10,6 +10,8 @@
   menu: Clients
 - name: Delivery Services
   menu: Delivery Services
+- name: Collections Rate Card
+  menu: Collections Rate Card
 - name: People
   menu: People
 - name: Settings

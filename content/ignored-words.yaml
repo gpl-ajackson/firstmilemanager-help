@@ -14,3 +14,6 @@
 # The place goods are collected from, as in a Collection Address's "Site contact" (GLOSSARY.md
 # avoids it as a name for a Collection Address).
 - site
+# A pallet's size, as the rate card's "Full pallet" line names it (GLOSSARY.md avoids it as a
+# name for a Joint Operator).
+- full
