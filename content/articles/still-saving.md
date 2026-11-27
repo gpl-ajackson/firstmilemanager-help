@@ -1,6 +1,6 @@
 ---
 title: Still saving
-summary: Why a client shows Still saving after you change it, what you can carry on doing, and what to do when a change could not be saved.
+summary: Why a client shows Still saving after you change it, who is told when it takes a long time, and what to do when a change could not be saved.
 type: Concept
 product_area: Clients
 audience_tier: Staff
@@ -13,6 +13,7 @@ team_roles: [Admin, Account Manager, Finance Manager]
 source_references:
   - fmm#58
   - ADR-0011
+  - ADR-0012
 related_articles: [set-up-a-client, contacts-and-collection-addresses]
 ---
 
@@ -36,6 +37,19 @@ At Trentside Haulage, Priya Nair changes the invoice address of Sherwood Print W
 Everyone who can open the client sees it. To list only the clients with a change still saving, open the filters on **Clients** and turn on **Still saving**.
 
 While several changes are taking longer than usual, Admins also see a message at the top of every page.
+
+## When a change takes a long time {#alerts}
+
+A short wait alerts nobody. A long one does, so that it is noticed.
+
+- **After 4 [Working Hours](term:working-hours)**, the client's Account Manager is told. The message reads "A change to Sherwood Print Works is still saving after 4 working hours".
+- **After 1 working day**, your Admins are told too.
+
+Working Hours are Monday to Friday, 8am to 6pm UK time, outside bank holidays. Evenings and weekends don't count. A change saved at 5pm on Friday alerts the Account Manager at 11am on Monday.
+
+The messages are under the bell at the top of the page, and each one links to the client. They go by themselves once the change has finished saving. No email is sent.
+
+After the first message, you don't need to do anything. If you are an Admin and get the second, get in touch with First Mile Manager.
 
 ## What never shows it {#what-never-shows-it}
 

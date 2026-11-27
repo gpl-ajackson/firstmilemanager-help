@@ -1,6 +1,6 @@
 ---
 title: Waiting for Stockist
-summary: Why a client shows Waiting for Stockist after you change it, what you can carry on doing, and what happens when Stockist refuses a change.
+summary: Why a client shows Waiting for Stockist after you change it, who is told when a change waits a long time, and what happens when Stockist refuses one.
 type: Concept
 product_area: Clients
 audience_tier: Staff
@@ -14,6 +14,7 @@ team_roles: [Admin, Account Manager, Finance Manager]
 source_references:
   - fmm#58
   - ADR-0011
+  - ADR-0012
 related_articles: [how-first-mile-manager-connects-to-stockist, set-up-a-client]
 ---
 
@@ -39,6 +40,19 @@ At Trentside Haulage, Priya Nair changes the invoice address of Sherwood Print W
 Everyone who can open the client sees it. To list only the clients with a waiting change, open the filters on **Clients** and turn on **Waiting for Stockist**.
 
 While First Mile Manager can't reach Stockist, Admins also see a message at the top of every page.
+
+## When a change waits a long time {#alerts}
+
+A short wait alerts nobody. A long one does, so that an outage is noticed.
+
+- **After 4 [Working Hours](term:working-hours)**, the client's Account Manager is told. The message reads "A change to Sherwood Print Works has waited more than 4 working hours for Stockist".
+- **After 1 working day**, your Admins are told too.
+
+Working Hours are Monday to Friday, 8am to 6pm UK time, outside bank holidays. Evenings and weekends don't count. A change saved at 5pm on Friday alerts the Account Manager at 11am on Monday.
+
+The messages are under the bell at the top of the page, and each one links to the client. They go by themselves once Stockist takes the change. No email is sent.
+
+After the first message, you don't need to do anything. If you are an Admin and get the second, check that Stockist is working for your team. If it is, get in touch with First Mile Manager.
 
 ## What never waits {#what-never-waits}
 

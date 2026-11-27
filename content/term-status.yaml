@@ -178,6 +178,11 @@ Waiting for Stockist:
   status: Published
   product_area: Clients
   fingerprint: 360bc46b28eb
+# Built by fmm#76: readers meet it in the alerts on a change that has waited a long time.
+Working Hours:
+  status: Published
+  product_area: Clients
+  fingerprint: 2aa3c28f354c
 
 # Charges and invoices
 
