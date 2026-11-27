@@ -6,6 +6,8 @@
 #
 # Settings is the Operator's own settings page (your business, and its Connection), in the
 # team menu.
+- name: Clients
+  menu: Clients
 - name: People
   menu: People
 - name: Settings

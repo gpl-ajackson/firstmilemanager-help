@@ -19,3 +19,13 @@
 # Settings (fmm#57)
 - question: sign up
   answer: /articles/get-started-with-first-mile-manager
+
+# Clients (fmm#58)
+- question: add a new client
+  answer: /articles/set-up-a-client
+- question: client code already used
+  answer: /articles/set-up-a-client
+- question: change a client's account manager
+  answer: /articles/set-up-a-client#hand-over
+- question: what is a client
+  answer: /glossary/client

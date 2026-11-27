@@ -8,3 +8,6 @@
 # The person who set the business up, as Settings and the People list label them (GLOSSARY.md
 # avoids it as a name for the Admin role).
 - owner
+# A registered company, as in the client form's "Company registration number" (GLOSSARY.md avoids
+# it as a name for an Operator).
+- company
