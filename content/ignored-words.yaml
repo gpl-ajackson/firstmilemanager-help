@@ -11,3 +11,6 @@
 # A registered company, as in the client form's "Company registration number" (GLOSSARY.md avoids
 # it as a name for an Operator).
 - company
+# The place goods are collected from, as in a Collection Address's "Site contact" (GLOSSARY.md
+# avoids it as a name for a Collection Address).
+- site

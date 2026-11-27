@@ -135,13 +135,13 @@ Client Status:
   fingerprint: bde2e23d05e6
   stockist_fingerprint: 'cf663a82298d'
 Contact:
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: 55a99aa94934
 Collection Address:
-  status: Not built yet
+  status: Published
   product_area: Clients
-  fingerprint: ac4889d6de17
+  fingerprint: 0d09f08b56d5
 Invoice Frequency:
   status: Not built yet
   product_area: Clients

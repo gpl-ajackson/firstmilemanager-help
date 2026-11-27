@@ -13,7 +13,7 @@ team_roles: [Admin, Account Manager]
 source_references:
   - fmm#58
   - ADR-0008
-related_articles: [staff-roles-in-first-mile-manager, invite-people-to-first-mile-manager]
+related_articles: [contacts-and-collection-addresses, client-notifications, staff-roles-in-first-mile-manager, invite-people-to-first-mile-manager]
 ---
 
 ## In short
@@ -56,3 +56,5 @@ A Code another of your clients already has is refused as soon as you leave the f
 ## What happens next
 
 The client shows in **Clients** with the status Onboarding. Its page keeps every change under **History**, newest first, with who made it and when. A client is never deleted, so its history is always there.
+
+Next, add the client's contacts and the places you collect from: see [](article:contacts-and-collection-addresses).

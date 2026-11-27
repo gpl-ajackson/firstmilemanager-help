@@ -29,3 +29,15 @@
   answer: /articles/set-up-a-client#hand-over
 - question: what is a client
   answer: /glossary/client
+- question: add a contact to a client
+  answer: /articles/contacts-and-collection-addresses#add-contact
+- question: add a collection address
+  answer: /articles/contacts-and-collection-addresses#add-address
+- question: change the default collection address
+  answer: /articles/contacts-and-collection-addresses#default
+- question: client email or sms
+  answer: /articles/client-notifications
+- question: who gets collection emails
+  answer: /articles/client-notifications#who
+- question: what is a collection address
+  answer: /glossary/collection-address
