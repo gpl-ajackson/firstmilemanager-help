@@ -67,6 +67,7 @@ Idempotency Key:
   status: Internal
   product_area: Settings
   fingerprint: fd9eddf9366d
+  stockist_fingerprint: '8bb164fc7769'
 App Secret:
   status: Internal
   product_area: Settings
