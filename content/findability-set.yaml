@@ -41,3 +41,13 @@
   answer: /articles/client-notifications#who
 - question: what is a collection address
   answer: /glossary/collection-address
+- question: how often is a client invoiced
+  answer: /articles/set-up-a-client#invoice-frequency
+- question: change invoice frequency from a date
+  answer: /articles/set-up-a-client#from-a-date
+- question: weight tolerance
+  answer: /articles/set-up-a-client#difference-rules
+- question: what is invoice frequency
+  answer: /glossary/invoice-frequency
+- question: what are difference rules
+  answer: /glossary/difference-rules

@@ -143,13 +143,13 @@ Collection Address:
   product_area: Clients
   fingerprint: 0d09f08b56d5
 Invoice Frequency:
-  status: Not built yet
+  status: Published
   product_area: Clients
-  fingerprint: 209729eecc8f
+  fingerprint: 09a046746298
 Difference Rules:
-  status: Not built yet
+  status: Published
   product_area: Clients
-  fingerprint: d63e56a9df93
+  fingerprint: c2ff441451ca
 Shadow Client:
   status: Not built yet
   product_area: Clients
