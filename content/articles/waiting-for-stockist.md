@@ -31,7 +31,7 @@ Most changes reach Stockist within a minute. If Stockist can't be reached, the c
 
 Stockist takes the waiting changes in the order you made them. Two changes to the same client always arrive the right way round.
 
-At Trentside Haulage, Priya Nair changes the invoice address of Sherwood Print Works while Stockist is down. The new address shows in First Mile Manager at once. **Waiting for Stockist** shows on the client until Stockist is back.
+At Trentside Logistics, Priya Nair changes the invoice address of Sherwood Print Works while Stockist is down. The new address shows in First Mile Manager at once. **Waiting for Stockist** shows on the client until Stockist is back.
 
 ## Where you see it {#where}
 

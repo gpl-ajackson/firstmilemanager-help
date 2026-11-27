@@ -36,7 +36,7 @@ The Connection is fixed: it ties your business to that one Stockist team for goo
 
 Each person's [Sign-in](term:sign-in) is the same in both apps. Signing in to one signs them in to the other, and signing out of one signs them out of both. A changed password reaches the other app within a minute. First Mile Manager checks Sign-ins itself, so people can still sign in while Stockist can't be reached.
 
-Roles are separate. A person's [Staff Roles](term:staff-role) in First Mile Manager are given in First Mile Manager, and their Stockist roles in Stockist. At Trentside Haulage, Gemma Hartley is a Transport Manager with no Stockist role. Her Sign-in opens First Mile Manager only.
+Roles are separate. A person's [Staff Roles](term:staff-role) in First Mile Manager are given in First Mile Manager, and their Stockist roles in Stockist. At Trentside Logistics, Gemma Hartley is a Transport Manager with no Stockist role. Her Sign-in opens First Mile Manager only.
 
 ## Adding someone from your Stockist team {#add-from-stockist}
 

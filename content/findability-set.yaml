@@ -26,15 +26,15 @@
 - question: client code already used
   answer: /articles/set-up-a-client
 - question: change a client's account manager
-  answer: /articles/set-up-a-client#hand-over
+  answer: /articles/set-up-a-client
 - question: what is a client
   answer: /glossary/client
 - question: add a contact to a client
-  answer: /articles/contacts-and-collection-addresses#add-contact
+  answer: /articles/contacts-and-collection-addresses
 - question: add a collection address
-  answer: /articles/contacts-and-collection-addresses#add-address
+  answer: /articles/contacts-and-collection-addresses
 - question: change the default collection address
-  answer: /articles/contacts-and-collection-addresses#default
+  answer: /articles/contacts-and-collection-addresses
 - question: client email or sms
   answer: /articles/client-notifications
 - question: who gets collection emails
@@ -42,11 +42,11 @@
 - question: what is a collection address
   answer: /glossary/collection-address
 - question: how often is a client invoiced
-  answer: /articles/set-up-a-client#invoice-frequency
+  answer: /articles/set-up-a-client
 - question: change invoice frequency from a date
   answer: /articles/set-up-a-client#from-a-date
 - question: weight tolerance
-  answer: /articles/set-up-a-client#difference-rules
+  answer: /articles/set-up-a-client
 - question: what is invoice frequency
   answer: /glossary/invoice-frequency
 - question: what are difference rules
@@ -58,9 +58,9 @@
 - question: put a client on hold
   answer: /articles/client-statuses#on-hold
 - question: close a client
-  answer: /articles/client-statuses#closed
+  answer: /articles/client-statuses
 - question: client is leaving
-  answer: /articles/client-statuses#offboarding
+  answer: /articles/client-statuses
 - question: what is a client status
   answer: /glossary/client-status
 - question: what is link review
@@ -78,22 +78,22 @@
 - question: add a delivery service
   answer: /articles/delivery-services#add
 - question: stop selling a service
-  answer: /articles/delivery-services#retire
+  answer: /articles/delivery-services
 - question: what is a delivery service
   answer: /glossary/delivery-service
 - question: set standard collection prices
-  answer: /articles/set-up-your-standard-collections-rate-card#prices
+  answer: /articles/set-up-your-standard-collections-rate-card
 - question: approve a price change
   answer: /articles/set-up-your-standard-collections-rate-card#approve
 - question: charge for sms
-  answer: /articles/set-up-your-standard-collections-rate-card#other-charges
+  answer: /articles/set-up-your-standard-collections-rate-card
 - question: what is a collections rate card
   answer: /glossary/collections-rate-card
 - question: change what a client pays for collections
-  answer: /articles/change-a-clients-collection-prices#prices
-- question: what did a client pay on a date
-  answer: /articles/change-a-clients-collection-prices#on-a-date
+  answer: /articles/change-a-clients-collection-prices
+- question: see a client's rate card on another date
+  answer: /articles/change-a-clients-collection-prices
 - question: approve a client price below standard
-  answer: /articles/change-a-clients-collection-prices#approve
+  answer: /articles/change-a-clients-collection-prices
 - question: put a client back on standard prices
-  answer: /articles/change-a-clients-collection-prices#back-to-standard
+  answer: /articles/change-a-clients-collection-prices

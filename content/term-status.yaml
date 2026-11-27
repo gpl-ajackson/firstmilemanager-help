@@ -58,6 +58,23 @@ Headless Team:
   product_area: Settings
   fingerprint: 4a9b43a1d508
   stockist_fingerprint: 'b81f9db5c424'
+# How the two systems talk to each other (fmm#89): readers never see these by name.
+Change Sequence:
+  status: Internal
+  product_area: Settings
+  fingerprint: 7053078e9dca
+Idempotency Key:
+  status: Internal
+  product_area: Settings
+  fingerprint: fd9eddf9366d
+App Secret:
+  status: Internal
+  product_area: Settings
+  fingerprint: d2beceaba560
+Hand-off:
+  status: Internal
+  product_area: Settings
+  fingerprint: 3c850603d139
 
 # People, sign-ins and roles
 
@@ -65,6 +82,14 @@ Headless Team:
   status: Published
   product_area: People
   fingerprint: 197fee40dfe7
+'Sign-in ID':
+  status: Internal
+  product_area: People
+  fingerprint: b49021f90d8c
+'Sign-in Key':
+  status: Internal
+  product_area: People
+  fingerprint: 3109295c0cad
 Team Role:
   status: Published
   product_area: People

@@ -64,6 +64,6 @@ A retired Delivery Service keeps its name, so past charges still show it. It can
 
 > You already have a retired Delivery Service called Next-day parcel. Choose a different name.
 
-A Delivery Service you have just added or changed may show **Still saving** for a moment. It is already in use, and it finishes by itself: see [](article:still-saving). If it takes more than 4 [Working Hours](term:working-hours), you are told under the bell, and your Admin after a working day.
+A Delivery Service you added or changed a moment ago may show **Still saving** for a moment. It is already in use, and it finishes by itself: see [](article:still-saving). If it takes more than 4 [Working Hours](term:working-hours), you are told under the bell, and your Admin after a working day.
 
 If a change shows **Needs saving again**, you get a message under the bell. Select **Change** beside the Delivery Service, change it and select **Save**. If it still shows, get in touch with us.
