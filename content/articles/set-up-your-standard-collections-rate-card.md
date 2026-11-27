@@ -13,7 +13,7 @@ team_roles: [Admin, Finance Manager]
 source_references:
   - fmm#58
   - ADR-0018
-related_articles: [delivery-services, still-saving, staff-roles-in-first-mile-manager, set-up-a-client]
+related_articles: [change-a-clients-collection-prices, delivery-services, still-saving, staff-roles-in-first-mile-manager, set-up-a-client]
 ---
 
 ## In short
@@ -28,7 +28,7 @@ Add your [Delivery Services](term:delivery-service) first: see [](article:delive
 
 ## Decide first
 
-Your standard [Collections Rate Card](term:collections-rate-card) holds the prices every client starts from. Enter what you would quote a new client today.
+Your standard [Collections Rate Card](term:collections-rate-card) holds the prices every client starts from. Enter what you would quote a new client today. A change to a standard price reaches every client still on that price, from the same date. A client with its own price for a line keeps it: see [](article:change-a-clients-collection-prices).
 
 A price can't start before today, and a change never alters an earlier date. To raise prices in the new year, enter them now with 1 January as the date.
 

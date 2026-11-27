@@ -38,6 +38,7 @@ At Trentside Haulage, Priya Nair changes the invoice address of Sherwood Print W
 - In the **Clients** list, in the **Saving** column.
 - In the **Delivery Services** list, in the **Saving** column, beside a [Delivery Service](term:delivery-service) you have added or changed.
 - On the **Collections Rate Card**, under **Latest changes**, beside prices an Admin has approved.
+- On a client's **Collections Rate Card**, under **Latest changes**, beside prices set for that client. The client shows the marker too.
 
 Everyone who can open the client sees it. To list only the clients with a waiting change, open the filters on **Clients** and turn on **Waiting for Stockist**.
 
@@ -50,7 +51,7 @@ A short wait alerts nobody. A long one does, so that an outage is noticed.
 - **After 4 [Working Hours](term:working-hours)**, the client's Account Manager is told. The message reads "A change to Sherwood Print Works has waited more than 4 working hours for Stockist".
 - **After 1 working day**, your Admins are told too.
 
-A change to a Delivery Service has no Account Manager. After 4 Working Hours, whoever made the change is told instead. For approved prices on the Collections Rate Card, it is whoever sent them for approval.
+A change to a Delivery Service has no Account Manager. After 4 Working Hours, whoever made the change is told instead. For approved prices on your standard Collections Rate Card, it is whoever sent them for approval. Prices on a client's card are a change to that client, so its Account Manager is told.
 
 Working Hours are Monday to Friday, 8am to 6pm UK time, outside bank holidays. Evenings and weekends don't count. A change saved at 5pm on Friday alerts the Account Manager at 11am on Monday.
 

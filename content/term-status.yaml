@@ -207,13 +207,11 @@ Delivery Service:
   product_area: Delivery Services
   ahead: true
   fingerprint: 536ffa4532d4
-# Built by fmm#82 (the standard card). Ahead: its entry leaves out each Client's own card, which
-# later tickets build.
+# Built by fmm#82 (the standard card) and fmm#83 (each Client's own card).
 Collections Rate Card:
   status: Published
   product_area: Collections Rate Card
-  ahead: true
-  fingerprint: 0574df67fe26
+  fingerprint: 32a908154f88
 Collections Invoice:
   status: Not built yet
   product_area: Billing
