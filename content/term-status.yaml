@@ -155,12 +155,15 @@ Shadow Client:
   status: Published
   product_area: Clients
   fingerprint: 5796177b6637
+# Built by fmm#78. The entry leaves out which side keeps the business's identity and each side's
+# own Client Status, which come with fmm#80.
 Client Link:
-  status: Not built yet
+  status: Published
   product_area: Clients
+  ahead: true
   fingerprint: 696afa6386d6
 Sure Match:
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: 485bfc01b94c
 Link Review:

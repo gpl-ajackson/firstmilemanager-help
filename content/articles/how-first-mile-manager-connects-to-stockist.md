@@ -1,6 +1,6 @@
 ---
 title: How First Mile Manager connects to Stockist
-summary: How a business that runs Stockist switches First Mile Manager on, shares one Sign-in, moves between the two and sees its First Mile Manager clients in Stockist.
+summary: How a business that runs Stockist switches First Mile Manager on, shares one Sign-in, and keeps each client as one client across the two.
 type: Concept
 product_area: Settings
 audience_tier: Staff
@@ -15,7 +15,8 @@ source_references:
   - fmm#57
   - fmm#58
   - ADR-0011
-related_articles: [sign-in-to-first-mile-manager, invite-people-to-first-mile-manager, staff-roles-in-first-mile-manager, waiting-for-stockist]
+  - ADR-0014
+related_articles: [sign-in-to-first-mile-manager, invite-people-to-first-mile-manager, staff-roles-in-first-mile-manager, waiting-for-stockist, set-up-a-client]
 ---
 
 ## In short
@@ -51,3 +52,46 @@ A Shadow Client holds only the client's Code, name, invoice address, tax and cus
 You change a Shadow Client by changing the client in First Mile Manager. Each change reaches Stockist by itself, in the order you made it, usually within a minute.
 
 Contacts, Collection Addresses, notifications, the Account Manager, the Invoice Frequency and the Difference Rules stay in First Mile Manager. Stockist never holds them.
+
+## Client Links {#client-links}
+
+Every client has a [Client Link](term:client-link): the tie to the one Stockist client that is the same business. A client can't go Active until it has one. Its checklist shows this as **Its Client Link**.
+
+When you save a new client, First Mile Manager asks Stockist whether it already has that business. Stockist answers with each of its clients that has:
+
+- the same company registration number;
+- the same VAT number;
+- the same name, once "Ltd", "Limited", "Co." and punctuation are left out;
+- the same invoice postcode and a name with the same first word.
+
+First Mile Manager then does one of three things.
+
+| What Stockist has | What happens |
+| --- | --- |
+| Exactly one client with the same company registration number | A [Sure Match](term:sure-match). The client is linked to that Stockist client by itself, and no Shadow Client is made. |
+| No client that could be the same business | The client gets a Shadow Client by itself. |
+| Anything else | The client waits for Link Review. Its checklist says **Waiting for Link Review**. |
+
+### A Sure Match {#sure-match}
+
+The Account Manager gets a message under the bell, naming the Stockist client and its Code. The client's history records the link too. If the two are not the same business, tell your Finance Manager or Admin before the client's first booking.
+
+A VAT number alone is never a Sure Match, because the companies in a VAT group share one number. A client with no company registration number can't be a Sure Match either.
+
+### Waiting for Link Review {#waiting-for-link-review}
+
+Stockist has a client that could be the same business, and a person has to decide. The client stays in Onboarding until your Finance Manager has decided. Nothing is made in Stockist while it waits, so the same business is never set up twice.
+
+At Trentside Logistics, Brew Republic Coffee Co. is already a warehouse client. A new client with the same VAT number but another company registration number waits for Link Review.
+
+### Codes {#codes}
+
+A Code is used once across both apps. When you enter a Code a Stockist client already uses, First Mile Manager refuses it at once:
+
+> BREW is already used by Brew Republic Coffee Co. in Stockist. Choose a different Code.
+
+Choose another Code and save.
+
+### When Stockist can't be reached {#client-links-waiting}
+
+Your new client is saved and stays in Onboarding, marked **Waiting for Stockist**. First Mile Manager makes no Shadow Client while it can't ask, because Stockist may already have the business. It asks by itself within a minute of Stockist coming back, and then makes the Client Link. You don't need to do anything.
