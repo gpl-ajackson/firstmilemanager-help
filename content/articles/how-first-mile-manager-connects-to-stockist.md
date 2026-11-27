@@ -18,7 +18,8 @@ source_references:
   - ADR-0014
   - ADR-0015
   - ADR-0016
-related_articles: [sign-in-to-first-mile-manager, invite-people-to-first-mile-manager, staff-roles-in-first-mile-manager, waiting-for-stockist, settle-a-possible-match-in-link-review]
+  - ADR-0020
+related_articles: [sign-in-to-first-mile-manager, invite-people-to-first-mile-manager, waiting-for-stockist, settle-a-possible-match-in-link-review, change-a-clients-collection-prices]
 ---
 
 ## In short
@@ -127,6 +128,30 @@ A change to the client's details that was still **Waiting for Stockist** at the 
 > Sherwood Print Works is kept in Stockist now, so First Mile Manager can't change its details.
 
 Make the change in Stockist instead.
+
+## Warehouse prices on a client's card {#warehouse-prices}
+
+A client's [Collections Rate Card](term:collections-rate-card) page shows everything the client pays. Under the collection prices you keep, **Warehouse prices** lists what the client pays for warehouse work. It shows once the client has its Client Link.
+
+The warehouse prices are marked **Kept in Stockist**. You can read them in First Mile Manager and can't change them there. Your warehouse team changes them in Stockist, and the card shows the change the next time you open it.
+
+Each line shows the charge, its price, and whether it is **Standard** or the **Client's own** in Stockist. A price that depends on quantity shows a line for each band. **Show the card on** changes both lists to the date you choose.
+
+The collection prices are kept in First Mile Manager. To change them, see [](article:change-a-clients-collection-prices).
+
+At Trentside Logistics, Brew Republic Coffee Co. is a warehouse client. Its card shows its warehouse prices under its collection prices.
+
+A client with a Shadow Client does no warehouse work. Its card says:
+
+> Stockist holds no warehouse prices for this client on this date.
+
+### When Stockist can't be reached {#warehouse-prices-waiting}
+
+The card still shows the collection prices, and you can still change them. In place of the warehouse prices it says:
+
+> First Mile Manager can't reach Stockist at the moment, so it can't show this client's warehouse prices.
+
+The warehouse prices are safe in Stockist. They show again by themselves within a minute of Stockist coming back.
 
 ## Undo a link {#undo-a-link}
 
