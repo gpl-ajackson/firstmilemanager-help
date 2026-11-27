@@ -16,7 +16,8 @@ source_references:
   - fmm#58
   - ADR-0011
   - ADR-0014
-related_articles: [sign-in-to-first-mile-manager, invite-people-to-first-mile-manager, staff-roles-in-first-mile-manager, waiting-for-stockist, set-up-a-client]
+  - ADR-0015
+related_articles: [sign-in-to-first-mile-manager, invite-people-to-first-mile-manager, staff-roles-in-first-mile-manager, waiting-for-stockist, settle-a-possible-match-in-link-review]
 ---
 
 ## In short
@@ -80,7 +81,9 @@ A VAT number alone is never a Sure Match, because the companies in a VAT group s
 
 ### Waiting for Link Review {#waiting-for-link-review}
 
-Stockist has a client that could be the same business, and a person has to decide. The client stays in Onboarding until your Finance Manager has decided. Nothing is made in Stockist while it waits, so the same business is never set up twice.
+Stockist has a client that could be the same business, and a person has to decide. The client stays in Onboarding until your Finance Manager has decided, in [Link Review](term:link-review). Nothing is made in Stockist while it waits, so the same business is never set up twice.
+
+The Finance Manager settles it as **Same business** or **Not the same**: see [](article:settle-a-possible-match-in-link-review).
 
 At Trentside Logistics, Brew Republic Coffee Co. is already a warehouse client. A new client with the same VAT number but another company registration number waits for Link Review.
 

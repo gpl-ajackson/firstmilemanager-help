@@ -63,6 +63,8 @@
   answer: /articles/client-statuses#offboarding
 - question: what is a client status
   answer: /glossary/client-status
+- question: what is link review
+  answer: /glossary/link-review
 - question: still saving
   answer: /articles/still-saving
 - question: client change taking a long time to save
