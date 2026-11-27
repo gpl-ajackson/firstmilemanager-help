@@ -18,11 +18,11 @@ related_articles: [contacts-and-collection-addresses, set-up-a-client]
 
 ## In short
 
-Open the client from **Clients** and select **Change notifications**. For each of Booking confirmed, Driver on the way, Collected and Failed, choose Email, SMS, Email and SMS, or Neither.
+Open the client from **Clients**, select **More**, then **Change notifications**. For each of Booking confirmed, Driver on the way, Collected and Failed, choose Email, SMS, Email and SMS, or Neither.
 
 ## Before you start
 
-You need to be an Admin or an [Account Manager](term:account-manager). A Finance Manager sees the choices under **Notifications** but doesn't see **Change notifications**.
+You need to be an Admin or an [Account Manager](term:account-manager). A Finance Manager sees the choices under **Notifications** but doesn't see **Change notifications** under **More**.
 
 Emails go to the client's [contacts](term:contact) with the Collection alerts purpose. An SMS goes to the site contact at the [Collection Address](term:collection-address) being collected from. To add them, see [](article:contacts-and-collection-addresses).
 
@@ -31,7 +31,7 @@ Emails go to the client's [contacts](term:contact) with the Collection alerts pu
 ### Choose what the client gets {#choose}
 
 1. Go to **Clients** and select the [client](term:client).
-2. Select **Change notifications**.
+2. Select **More**, then **Change notifications**.
 3. For each of **Booking confirmed**, **Driver on the way**, **Collected** and **Failed**, choose **Email**, **SMS**, **Email and SMS** or **Neither**.
 4. Select **Save**. The change shows under **History**, with your name and the time.
 

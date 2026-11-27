@@ -51,6 +51,18 @@
   answer: /glossary/invoice-frequency
 - question: what are difference rules
   answer: /glossary/difference-rules
+- question: make a client active
+  answer: /articles/set-up-a-client#checklist
+- question: client can't go active
+  answer: /articles/set-up-a-client#checklist
+- question: put a client on hold
+  answer: /articles/client-statuses#on-hold
+- question: close a client
+  answer: /articles/client-statuses#closed
+- question: client is leaving
+  answer: /articles/client-statuses#offboarding
+- question: what is a client status
+  answer: /glossary/client-status
 - question: still saving
   answer: /articles/still-saving
 - question: client change taking a long time to save

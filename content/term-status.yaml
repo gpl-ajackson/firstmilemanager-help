@@ -130,8 +130,9 @@ Client:
   ahead: true
   fingerprint: f4aa80be315a
 Client Status:
-  status: Not built yet
+  status: Published
   product_area: Clients
+  ahead: true
   fingerprint: bde2e23d05e6
   stockist_fingerprint: 'cf663a82298d'
 Contact:
