@@ -1,6 +1,6 @@
 ---
 title: How First Mile Manager connects to Stockist
-summary: How a business that runs Stockist switches First Mile Manager on, shares one Sign-in and moves between the two.
+summary: How a business that runs Stockist switches First Mile Manager on, shares one Sign-in, moves between the two and sees its First Mile Manager clients in Stockist.
 type: Concept
 product_area: Settings
 audience_tier: Staff
@@ -8,12 +8,14 @@ owner: gpl-ajackson
 status: Published
 feature: Staff sign-in and roles
 joint_only: true
-checked_on: 2026-11-15
-next_review_on: 2027-05-15
-team_roles: [Admin]
+checked_on: 2026-11-27
+next_review_on: 2027-05-27
+team_roles: [Admin, Account Manager, Finance Manager]
 source_references:
   - fmm#57
-related_articles: [sign-in-to-first-mile-manager, invite-people-to-first-mile-manager, staff-roles-in-first-mile-manager]
+  - fmm#58
+  - ADR-0011
+related_articles: [sign-in-to-first-mile-manager, invite-people-to-first-mile-manager, staff-roles-in-first-mile-manager, waiting-for-stockist]
 ---
 
 ## In short
@@ -38,4 +40,14 @@ An Admin can give someone who already works in your Stockist team their First Mi
 
 ## Moving between the two {#moving-between}
 
-Select **Open Stockist** in First Mile Manager's menu to open your Stockist team, already signed in. If First Mile Manager can't reach Stockist, Admins see a message saying so. Anything waiting shows **Waiting for Stockist** until it goes through.
+Select **Open Stockist** in First Mile Manager's menu to open your Stockist team, already signed in. If First Mile Manager can't reach Stockist, Admins see a message saying so. Anything waiting shows **Waiting for Stockist** until it goes through: see [](article:waiting-for-stockist).
+
+## Shadow Clients {#shadow-clients}
+
+Stockist needs the clients you collect from too, for its rate cards, labels and customs paperwork. Nobody enters them twice. For a [client](term:client) Stockist doesn't already have, First Mile Manager keeps a [Shadow Client](term:shadow-client) in Stockist.
+
+A Shadow Client holds only the client's Code, name, invoice address, tax and customs numbers and Client Status. Stockist shows it read-only, marked as coming from First Mile Manager.
+
+You change a Shadow Client by changing the client in First Mile Manager. Each change reaches Stockist by itself, in the order you made it, usually within a minute.
+
+Contacts, Collection Addresses, notifications, the Account Manager, the Invoice Frequency and the Difference Rules stay in First Mile Manager. Stockist never holds them.

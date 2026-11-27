@@ -51,3 +51,11 @@
   answer: /glossary/invoice-frequency
 - question: what are difference rules
   answer: /glossary/difference-rules
+- question: still saving
+  answer: /articles/still-saving
+- question: client change taking a long time to save
+  answer: /articles/still-saving
+- question: change could not be saved
+  answer: /articles/still-saving#refused
+- question: what is a shadow client
+  answer: /glossary/shadow-client

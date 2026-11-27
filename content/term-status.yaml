@@ -151,7 +151,7 @@ Difference Rules:
   product_area: Clients
   fingerprint: c2ff441451ca
 Shadow Client:
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: 5796177b6637
 Client Link:
@@ -170,8 +170,12 @@ Link Review:
   status: Not built yet
   product_area: Clients
   fingerprint: 4fe38d00ec6b
+# Built by fmm#75. It has no Glossary Entry yet: the term names Stockist, and every Glossary Entry
+# is a page a reader at an FMM-only Operator can meet (Launch Check 3). The Joint-only Article
+# "Waiting for Stockist" explains it, and FMM-only readers have "Still saving". An entry needs
+# Glossary Entries that can be Joint-only, which is a help centre change for AJ to decide.
 Waiting for Stockist:
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: 360bc46b28eb
 
