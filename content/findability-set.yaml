@@ -75,3 +75,9 @@
   answer: /glossary/shadow-client
 - question: what is a take-over
   answer: /glossary/take-over
+- question: add a delivery service
+  answer: /articles/delivery-services#add
+- question: stop selling a service
+  answer: /articles/delivery-services#retire
+- question: what is a delivery service
+  answer: /glossary/delivery-service

@@ -191,7 +191,7 @@ Kept in Stockist:
 Waiting for Stockist:
   status: Published
   product_area: Clients
-  fingerprint: 360bc46b28eb
+  fingerprint: ee879ceafd0a
 # Built by fmm#76: readers meet it in the alerts on a change that has waited a long time.
 Working Hours:
   status: Published
@@ -200,10 +200,13 @@ Working Hours:
 
 # Charges and invoices
 
+# Built by fmm#81. Ahead: its entry leaves out prices on the rate card and the planner's choice
+# of what fulfils it, which later tickets and slice 3 build.
 Delivery Service:
-  status: Not built yet
-  product_area: Billing
-  fingerprint: ddd6e1aeb551
+  status: Published
+  product_area: Delivery Services
+  ahead: true
+  fingerprint: 536ffa4532d4
 Collections Rate Card:
   status: Not built yet
   product_area: Billing

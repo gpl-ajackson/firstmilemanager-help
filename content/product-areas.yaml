@@ -8,6 +8,8 @@
 # team menu.
 - name: Clients
   menu: Clients
+- name: Delivery Services
+  menu: Delivery Services
 - name: People
   menu: People
 - name: Settings
