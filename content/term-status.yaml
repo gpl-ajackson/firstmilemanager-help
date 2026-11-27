@@ -58,6 +58,24 @@ Headless Team:
   product_area: Settings
   fingerprint: 4a9b43a1d508
   stockist_fingerprint: 'b81f9db5c424'
+# How the two systems talk to each other (fmm#89): readers never see these by name.
+Change Sequence:
+  status: Internal
+  product_area: Settings
+  fingerprint: 7053078e9dca
+Idempotency Key:
+  status: Internal
+  product_area: Settings
+  fingerprint: fd9eddf9366d
+  stockist_fingerprint: '8bb164fc7769'
+App Secret:
+  status: Internal
+  product_area: Settings
+  fingerprint: d2beceaba560
+Hand-off:
+  status: Internal
+  product_area: Settings
+  fingerprint: 3c850603d139
 
 # People, sign-ins and roles
 
@@ -65,6 +83,14 @@ Headless Team:
   status: Published
   product_area: People
   fingerprint: 197fee40dfe7
+'Sign-in ID':
+  status: Internal
+  product_area: People
+  fingerprint: b49021f90d8c
+'Sign-in Key':
+  status: Internal
+  product_area: People
+  fingerprint: 3109295c0cad
 Team Role:
   status: Published
   product_area: People
@@ -125,65 +151,93 @@ Worker Type:
 # Clients
 
 Client:
-  status: Not built yet
+  status: Published
   product_area: Clients
+  ahead: true
   fingerprint: f4aa80be315a
 Client Status:
-  status: Not built yet
+  status: Published
   product_area: Clients
+  ahead: true
   fingerprint: bde2e23d05e6
   stockist_fingerprint: 'cf663a82298d'
 Contact:
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: 55a99aa94934
 Collection Address:
-  status: Not built yet
+  status: Published
   product_area: Clients
-  fingerprint: ac4889d6de17
+  fingerprint: 0d09f08b56d5
 Invoice Frequency:
-  status: Not built yet
+  status: Published
   product_area: Clients
-  fingerprint: 209729eecc8f
+  fingerprint: 09a046746298
 Difference Rules:
-  status: Not built yet
+  status: Published
   product_area: Clients
-  fingerprint: d63e56a9df93
+  fingerprint: c2ff441451ca
 Shadow Client:
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: 5796177b6637
+# Built by fmm#78. The entry leaves out which side keeps the business's identity and each side's
+# own Client Status, which come with fmm#80.
 Client Link:
-  status: Not built yet
+  status: Published
   product_area: Clients
+  ahead: true
   fingerprint: 696afa6386d6
 Sure Match:
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: 485bfc01b94c
 Link Review:
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: d4e6ddd58edb
+# Built by fmm#80: the Account Manager is told of a Take-over, and the client is Kept in Stockist
+# from then on. Its entry says "your warehouse system", as the other Client Link entries do.
 'Take-over':
-  status: Not built yet
+  status: Published
   product_area: Clients
   fingerprint: 4fe38d00ec6b
-Waiting for Stockist:
-  status: Not built yet
+# Built by fmm#80. Like Waiting for Stockist it has no Glossary Entry: the term names Stockist,
+# and every Glossary Entry is a page a reader at an FMM-only Operator can meet (Launch Check 3).
+# The Joint-only Article "How First Mile Manager connects to Stockist" explains it
+# (#kept-in-stockist).
+Kept in Stockist:
+  status: Published
   product_area: Clients
-  fingerprint: 360bc46b28eb
+  fingerprint: fbcfc4271862
+# Built by fmm#75. It has no Glossary Entry yet: the term names Stockist, and every Glossary Entry
+# is a page a reader at an FMM-only Operator can meet (Launch Check 3). The Joint-only Article
+# "Waiting for Stockist" explains it, and FMM-only readers have "Still saving". An entry needs
+# Glossary Entries that can be Joint-only, which is a help centre change for AJ to decide.
+Waiting for Stockist:
+  status: Published
+  product_area: Clients
+  fingerprint: ee879ceafd0a
+# Built by fmm#76: readers meet it in the alerts on a change that has waited a long time.
+Working Hours:
+  status: Published
+  product_area: Clients
+  fingerprint: 2aa3c28f354c
 
 # Charges and invoices
 
+# Built by fmm#81. Ahead: its entry leaves out prices on the rate card and the planner's choice
+# of what fulfils it, which later tickets and slice 3 build.
 Delivery Service:
-  status: Not built yet
-  product_area: Billing
-  fingerprint: ddd6e1aeb551
+  status: Published
+  product_area: Delivery Services
+  ahead: true
+  fingerprint: 536ffa4532d4
+# Built by fmm#82 (the standard card) and fmm#83 (each Client's own card).
 Collections Rate Card:
-  status: Not built yet
-  product_area: Billing
-  fingerprint: 6637ceb87481
+  status: Published
+  product_area: Collections Rate Card
+  fingerprint: 32a908154f88
 Collections Invoice:
   status: Not built yet
   product_area: Billing

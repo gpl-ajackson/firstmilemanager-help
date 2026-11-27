@@ -37,7 +37,7 @@ The person who set up your business is always an Admin, and nobody can take that
 
 ## Several roles at once {#several-roles}
 
-Give a person every role they need, rather than a second Sign-in. At Trentside Haulage, Lee Marsh drives a round in the morning and checks in collected goods after lunch. He is both a Driver and a Warehouse Operative.
+Give a person every role they need, rather than a second Sign-in. At Trentside Logistics, Lee Marsh drives a round in the morning and checks in collected goods after lunch. He is both a Driver and a Warehouse Operative.
 
 ## Worker Type {#worker-type}
 

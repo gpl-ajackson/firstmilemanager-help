@@ -19,3 +19,81 @@
 # Settings (fmm#57)
 - question: sign up
   answer: /articles/get-started-with-first-mile-manager
+
+# Clients (fmm#58)
+- question: add a new client
+  answer: /articles/set-up-a-client
+- question: client code already used
+  answer: /articles/set-up-a-client
+- question: change a client's account manager
+  answer: /articles/set-up-a-client
+- question: what is a client
+  answer: /glossary/client
+- question: add a contact to a client
+  answer: /articles/contacts-and-collection-addresses
+- question: add a collection address
+  answer: /articles/contacts-and-collection-addresses
+- question: change the default collection address
+  answer: /articles/contacts-and-collection-addresses
+- question: client email or sms
+  answer: /articles/client-notifications
+- question: who gets collection emails
+  answer: /articles/client-notifications#who
+- question: what is a collection address
+  answer: /glossary/collection-address
+- question: how often is a client invoiced
+  answer: /articles/set-up-a-client
+- question: change invoice frequency from a date
+  answer: /articles/set-up-a-client#from-a-date
+- question: weight tolerance
+  answer: /articles/set-up-a-client
+- question: what is invoice frequency
+  answer: /glossary/invoice-frequency
+- question: what are difference rules
+  answer: /glossary/difference-rules
+- question: make a client active
+  answer: /articles/set-up-a-client#checklist
+- question: client can't go active
+  answer: /articles/set-up-a-client#checklist
+- question: put a client on hold
+  answer: /articles/client-statuses#on-hold
+- question: close a client
+  answer: /articles/client-statuses
+- question: client is leaving
+  answer: /articles/client-statuses
+- question: what is a client status
+  answer: /glossary/client-status
+- question: what is link review
+  answer: /glossary/link-review
+- question: still saving
+  answer: /articles/still-saving
+- question: client change taking a long time to save
+  answer: /articles/still-saving
+- question: change could not be saved
+  answer: /articles/still-saving#refused
+- question: what is a shadow client
+  answer: /glossary/shadow-client
+- question: what is a take-over
+  answer: /glossary/take-over
+- question: add a delivery service
+  answer: /articles/delivery-services#add
+- question: stop selling a service
+  answer: /articles/delivery-services
+- question: what is a delivery service
+  answer: /glossary/delivery-service
+- question: set standard collection prices
+  answer: /articles/set-up-your-standard-collections-rate-card
+- question: approve a price change
+  answer: /articles/set-up-your-standard-collections-rate-card#approve
+- question: charge for sms
+  answer: /articles/set-up-your-standard-collections-rate-card
+- question: what is a collections rate card
+  answer: /glossary/collections-rate-card
+- question: change what a client pays for collections
+  answer: /articles/change-a-clients-collection-prices
+- question: see a client's rate card on another date
+  answer: /articles/change-a-clients-collection-prices
+- question: approve a client price below standard
+  answer: /articles/change-a-clients-collection-prices
+- question: put a client back on standard prices
+  answer: /articles/change-a-clients-collection-prices

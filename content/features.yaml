@@ -9,3 +9,6 @@
 Staff sign-in and roles:
   spec: fmm#57
   on_demo: false
+Clients and rate cards:
+  spec: fmm#58
+  on_demo: false
