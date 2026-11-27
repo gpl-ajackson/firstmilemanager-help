@@ -93,7 +93,7 @@ At Trentside Logistics, Brew Republic Coffee Co. is already a warehouse client. 
 
 A Code is used once across both apps. When you enter a Code a Stockist client already uses, First Mile Manager refuses it at once:
 
-> BREW is already used by Brew Republic Coffee Co. in Stockist. Choose a different Code.
+> BRC is already used by Brew Republic Coffee Co. Ltd in Stockist. Choose a different Code.
 
 Choose another Code and save.
 
@@ -109,7 +109,7 @@ When a client is linked to a client Stockist already had, Stockist keeps its Cod
 - To change them, change the client in Stockist. The change shows in First Mile Manager by itself, and the client's history records what changed and who changed it.
 - Everything else is still changed in First Mile Manager: Contacts, Collection Addresses, notifications, the Account Manager, the Invoice Frequency, the Difference Rules and the Client Status.
 
-At Trentside Logistics, a new client with Brew Republic Coffee Co.'s company registration number is linked to it by a Sure Match. The client's Code becomes BREW, the Code the warehouse already uses.
+At Trentside Logistics, a new client with Brew Republic Coffee Co. Ltd's company registration number is linked to it by a Sure Match. The client's Code becomes BRC, the Code the warehouse already uses.
 
 If another of your clients already uses Stockist's Code in First Mile Manager, the new client keeps its own Code for now, and its page says so. Change the other client's Code, and the new client takes Stockist's by itself.
 

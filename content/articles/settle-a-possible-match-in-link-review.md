@@ -48,7 +48,7 @@ The reasons under **Why it could be the same business** are:
 - Almost the same name
 - The same invoice postcode and a similar name
 
-At Trentside Logistics, Mark Ellison opens **Link Review** and finds Brew Republic Coffee Company beside Brew Republic Coffee Co. They share a VAT number and an invoice postcode. Mark selects **Same business**.
+At Trentside Logistics, Mark Okafor opens **Link Review** and finds Brew Republic Coffee Co. beside Stockist's Brew Republic Coffee Co. Ltd. They share a VAT number. Mark selects **Same business**.
 
 ## What happens next
 
@@ -68,7 +68,7 @@ The client stays in Onboarding. Its checklist shows **Waiting for Link Review** 
 
 After 2 working days in Link Review, a message appears under the bell. Your Finance Managers and the client's Account Manager each get it:
 
-> Brew Republic Coffee Company has waited 2 working days in Link Review
+> Brew Republic Coffee Co. has waited 2 working days in Link Review
 
 A working day is 10 [Working Hours](term:working-hours), so evenings, weekends and bank holidays don't count. A client that joins Link Review at 3pm on Friday alerts you at 3pm on Tuesday.
 
@@ -78,6 +78,6 @@ If your business has no Finance Manager, your Admins get the message. It goes by
 
 Two people can have **Link Review** open at once. If someone settles a client before you do, you see:
 
-> Brew Republic Coffee Company is not waiting for Link Review. Someone may have settled it already.
+> Brew Republic Coffee Co. is not waiting for Link Review. Someone may have settled it already.
 
 Nothing changes. Open the client to see what was decided, in its history.

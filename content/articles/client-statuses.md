@@ -65,7 +65,7 @@ Select **Client Status**, then **Put On Hold**. You enter two things, and both a
 - **Reason (your team only)** says why. Only your team sees it.
 - **Message for the client** says what the client is told, in plain words.
 
-At Trentside Logistics, Mark Ellis puts Sherwood Print Works On Hold. His reason is "Two invoices overdue, £412 owed." His message for the client is "Call us about your collections."
+At Trentside Logistics, Mark Okafor puts Sherwood Print Works On Hold. His reason is "Two invoices overdue, £412 owed." His message for the client is "Call us about your collections."
 
 Both show on the client's page while it is On Hold. To end the hold, select **Client Status**, then **Take off hold**. The client goes back to the status it had before: Active or Offboarding.
 

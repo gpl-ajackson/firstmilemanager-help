@@ -28,7 +28,7 @@ When you add a [client](term:client) or change its details, First Mile Manager k
 
 A few details take one more step to finish saving. They are the Code, the name, the invoice address, the VAT number, the company registration number and the customs numbers. That step usually takes a moment. When it takes longer, the client shows **Still saving** until it is done.
 
-At Trentside Logistics, Priya Nair changes the invoice address of Sherwood Print Works. The new address shows on the client's page at once. **Still saving** shows at the top of the page for a few minutes, then goes.
+At Trentside Logistics, Priya Desai changes the invoice address of Sherwood Print Works. The new address shows on the client's page at once. **Still saving** shows at the top of the page for a few minutes, then goes.
 
 ## Where you see it {#where}
 
