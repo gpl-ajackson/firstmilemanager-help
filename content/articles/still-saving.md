@@ -14,6 +14,7 @@ source_references:
   - fmm#58
   - ADR-0011
   - ADR-0012
+  - ADR-0021
 related_articles: [set-up-a-client, contacts-and-collection-addresses]
 ---
 
@@ -55,6 +56,18 @@ Working Hours are Monday to Friday, 8am to 6pm UK time, outside bank holidays. E
 The messages are under the bell at the top of the page, and each one links to the client. They go by themselves once the change has finished saving. No email is sent.
 
 After the first message, you don't need to do anything. If you are an Admin and get the second, get in touch with First Mile Manager.
+
+## When prices haven't been checked {#prices-not-checked}
+
+First Mile Manager prices from each client's [Collections Rate Card](term:collections-rate-card), and checks those prices by itself several times a day. When it can't check a client's prices for more than 1 working day, your Finance Managers are told. If you have no Finance Manager, your Admins are told instead.
+
+The message reads "The collection prices of Sherwood Print Works haven't been checked for more than a working day". When several clients are affected, it gives the number of clients instead, and you get one message for all of them.
+
+This happens when checking has not worked for a working day. It also happens when a price change could not be saved and nobody has saved it again. Look under **Latest changes** on the client's card for prices marked **Needs saving again**, and select **Save again** beside them.
+
+First Mile Manager keeps using the prices on each client's card, with every change you have saved. Nothing is lost.
+
+The message is under the bell at the top of the page. It goes by itself once the prices have been checked. If it is still there the next day, get in touch with First Mile Manager.
 
 ## What never shows it {#what-never-shows-it}
 
